@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="CH-2-Insert-Initial-Course-Data" author="sanjoy.roy">
+        <sql><![CDATA[
+
+                    INSERT INTO COURSE (TITLE, DESCRIPTION, INSTRUCTOR, TOTALPLACE, WORKLOAD, ENABLED)
+                    VALUES ('Implementing Domain Driven Design', 'Domain Driven Design', 'Vaughn Vernon', 15, '5 hours per week', true);
+
+                    INSERT INTO COURSE (TITLE, DESCRIPTION, INSTRUCTOR, TOTALPLACE, WORKLOAD, ENABLED)
+                    VALUES ('Java EE 6 with GlassFish 3', 'Java EE 6', 'David Heffelfinger', 20, '6 hours per week', true);
+
+                    INSERT INTO COURSE (TITLE, DESCRIPTION, INSTRUCTOR, TOTALPLACE, WORKLOAD, ENABLED)
+                    VALUES ('Spring in Practice', 'Spring course', 'Willie Wheeler', 15, '4 hours per week', true);
+            ]]>
+        </sql>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>com.realtech.coursehateoas</groupId>
+        <artifactId>coursehateoas</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.realtech.coursehateoas</groupId>
+    <artifactId>coursehateoas-db</artifactId>
+    <name>COURSEHATEOAS DATABASE</name>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <finalName>coursehateoas-db</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>create-database</id>
+                        <phase>integration-test</phase>
+                        <configuration>
+                            <target>
+                                <property name="db.changelog.file" value="coursehateoas-master.xml" />
+                                <property name="database.url" value="jdbc:h2:~/coursehateoas;MODE=MySQL;" />
+                                <property name="database.username" value="sa" />
+                                <property name="database.password" value="" />
+                                <property name="database.driver" value="org.h2.Driver" />
+                                <property name="maven.compile.classpath" refid="maven.compile.classpath" />
+                                <ant antfile="${basedir}/build.xml">
+                                    <target name="db-clean"/>
+                                    <target name="db-create"/>
+                                    <target name="db-update"/>
+                                </ant>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
+        </dependency>
+    </dependencies>
+
+
+</project>

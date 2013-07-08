@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+    <changeSet id="CH-1-Create-Course-Table" author="sanjoy.roy">
+        <sql><![CDATA[
+
+                CREATE TABLE COURSE (
+                    ID NUMBER(19,0) NOT NULL AUTO_INCREMENT,
+                    TITLE VARCHAR2(200) NOT NULL,
+                    DESCRIPTION VARCHAR2(200) NOT NULL,
+                    INSTRUCTOR VARCHAR2(150) NOT NULL,
+                    TOTALPLACE INTEGER NOT NULL,
+                    CREATEDATE DATE DEFAULT SYSDATE,
+                    UPDATEDATE DATE DEFAULT SYSDATE,
+                    STARTDATE DATE DEFAULT SYSDATE,
+                    WORKLOAD VARCHAR2(150) NOT NULL,
+                    ENABLED TINYINT(1) NOT NULL,
+                    PRIMARY KEY(id)
+                );
+
+            ]]>
+        </sql>
+    </changeSet>
+</databaseChangeLog>
