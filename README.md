@@ -33,7 +33,10 @@ To run the application
 
 <p>From the command line with Maven:</p>
 
-<pre><code>$ cd coursehateoas-webapp
+<pre><code>
+$ cd coursehateoas
+$ mvn clean install
+$ cd coursehateoas-webapp
 $ mvn clean install -Pjetty jetty:run
 </code></pre>
 
