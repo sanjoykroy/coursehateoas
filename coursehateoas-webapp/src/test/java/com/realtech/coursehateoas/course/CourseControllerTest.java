@@ -2,7 +2,7 @@ package com.realtech.coursehateoas.course;
 
 
 import com.realtech.coursehateoas.course.domain.model.Course;
-import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
+import com.realtech.coursehateoas.course.service.CourseService;
 import com.realtech.coursehateoas.course.web.CourseController;
 import com.realtech.coursehateoas.course.web.CourseResourceAssembler;
 import org.mockito.InjectMocks;
@@ -33,7 +33,7 @@ public class CourseControllerTest {
     @InjectMocks
     private CourseController controller;
     @Mock
-    private CourseRepository repositoryMock;
+    private CourseService serviceMock;
     @Mock
     private CourseResourceAssembler courseResourceAssemblerMock;
     @Mock
@@ -51,13 +51,26 @@ public class CourseControllerTest {
     public void shouldLoadAllCourseResources() throws Exception {
         Course course =  getTestCourse();
         Page<Course> courses = new PageImpl<Course>(Arrays.asList(course));
-        when(repositoryMock.findAll()).thenReturn(courses);
+        when(serviceMock.getCourses()).thenReturn(courses);
         when(courseResourceAssemblerMock.toResource(course)).thenReturn(new Resource<Course>(course));
         this.mockMvc.perform(get("/courses")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
-        verify(repositoryMock).findAll();
+        verify(serviceMock).getCourses();
+        verify(courseResourceAssemblerMock).toResource(course);
+    }
+
+    @Test
+    public void shouldLoadASingleCourse() throws Exception {
+        Course course =  getTestCourse();
+        when(serviceMock.getCourse(100L)).thenReturn(course);
+        when(courseResourceAssemblerMock.toResource(course)).thenReturn(new Resource<Course>(course));
+        this.mockMvc.perform(get("/courses/100")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(serviceMock).getCourse(100L);
         verify(courseResourceAssemblerMock).toResource(course);
     }
 

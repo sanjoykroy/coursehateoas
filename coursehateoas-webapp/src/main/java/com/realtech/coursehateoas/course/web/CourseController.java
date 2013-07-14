@@ -1,7 +1,7 @@
 package com.realtech.coursehateoas.course.web;
 
 import com.realtech.coursehateoas.course.domain.model.Course;
-import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
+import com.realtech.coursehateoas.course.service.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ public class CourseController {
     private final static Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
 
     @Autowired
-    private CourseRepository repository;
+    private CourseService courseService;
     @Autowired
     private CourseResourceAssembler courseResourceAssembler;
 
@@ -39,7 +39,7 @@ public class CourseController {
     HttpEntity<Resources<Resource<Course>>> showCourses() {
         LOGGER.info("Loading all courses");
         Collection<Resource<Course>> courseResourceCollection = new ArrayList<Resource<Course>>();
-        for (Course course : repository.findAll()) {
+        for (Course course : courseService.getCourses()) {
             Resource<Course> courseResource = courseResourceAssembler.toResource(course);
             courseResourceCollection.add(courseResource);
         }
@@ -52,7 +52,7 @@ public class CourseController {
     @RequestMapping (method = RequestMethod.GET, value = "/{id}")
     HttpEntity<Resource<Course>> showSingleCourse(@PathVariable Long id) {
         LOGGER.info("Loading a single course based on id [{}]", id);
-        Resource<Course> courseResource = courseResourceAssembler.toResource(repository.findOne(id));
+        Resource<Course> courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
         return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
     }
 }
