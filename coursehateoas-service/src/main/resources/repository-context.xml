@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                            http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context-3.0.xsd
+                            http://www.springframework.org/schema/data/jpa
+                            http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
     <import resource="infrastructure.xml" />
 
-    <jpa:repositories base-package="com.realtech.coursehateoas.course.infrastructure" />
+    <context:component-scan base-package="com.realtech.coursehateoas.course.service" />
 
-    <!--<bean id="userIdRepository"  class="com.realtech.cloudschool.identityaccess.infrastructure.persistence.impl.UserIdRepositoryImpl" />-->
+    <jpa:repositories base-package="com.realtech.coursehateoas.course.infrastructure" />
 
 </beans>

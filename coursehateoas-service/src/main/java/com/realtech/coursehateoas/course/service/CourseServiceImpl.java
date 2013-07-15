@@ -3,11 +3,13 @@ package com.realtech.coursehateoas.course.service;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service
+@Service("courseService")
 public class CourseServiceImpl implements CourseService {
 
+    @Autowired
     private CourseRepository repository;
 
     @Override
@@ -34,6 +36,13 @@ public class CourseServiceImpl implements CourseService {
     public Course updateCourse(Long id, Course aCourse) throws CourseNotFoundException {
         Course existedCourse = this.getCourse(id);
         return repository.save(populateExistedCourseWithNewData(existedCourse, aCourse));
+    }
+
+    @Override
+    public Course deleteCourse(Long id) throws CourseNotFoundException {
+        Course existedCourse = this.getCourse(id);
+        repository.delete(existedCourse);
+        return existedCourse;
     }
 
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {

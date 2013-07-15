@@ -1,6 +1,7 @@
 package com.realtech.coursehateoas.course.web;
 
 import com.realtech.coursehateoas.course.domain.model.Course;
+import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.service.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,9 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -49,10 +48,45 @@ public class CourseController {
         return new ResponseEntity<Resources<Resource<Course>>>(courseResources, HttpStatus.OK);
     }
 
-    @RequestMapping (method = RequestMethod.GET, value = "/{id}")
-    HttpEntity<Resource<Course>> showSingleCourse(@PathVariable Long id) {
-        LOGGER.info("Loading a single course based on id [{}]", id);
+    @RequestMapping(method = RequestMethod.POST)
+    HttpEntity<Resource<Course>> createCourse(@RequestBody Course course) {
+        LOGGER.info("Creating a course - [{}]", course);
+        Course newCourse = courseService.createCourse(course);
+        Resource<Course> courseResource = courseResourceAssembler.toResource(newCourse);
+        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    HttpEntity<Resource<Course>> showCourse(@PathVariable Long id) {
+        LOGGER.info("Loading a course based on id [{}]", id);
         Resource<Course> courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
         return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    HttpEntity<Resource<Course>> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+        LOGGER.info("Updating a course - Course Id [{}]", id);
+        Course updatedCourse = courseService.updateCourse(id, course);
+        Resource<Course> courseResource = courseResourceAssembler.toResource(updatedCourse);
+        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    HttpEntity<Resource<Course>> cancelCourse(@PathVariable Long id) {
+        LOGGER.info("Deleting a course - Course Id [{}]", id);
+        Course deletedCourse = courseService.deleteCourse(id);
+        Resource<Course> courseResource = courseResourceAssembler.toResource(deletedCourse);
+        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+    }
+
+    @ExceptionHandler
+    ResponseEntity handleExceptions(Exception ex) {
+        ResponseEntity responseEntity = null;
+        if (ex instanceof CourseNotFoundException) {
+            responseEntity = new ResponseEntity(HttpStatus.NOT_FOUND);
+        } else {
+            responseEntity = new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
     }
 }

@@ -14,4 +14,6 @@ public interface CourseService {
     Course createCourse(Course aCourse);
 
     Course updateCourse(Long id, Course aCourse) throws CourseNotFoundException;
+
+    Course deleteCourse(Long id) throws CourseNotFoundException;
 }

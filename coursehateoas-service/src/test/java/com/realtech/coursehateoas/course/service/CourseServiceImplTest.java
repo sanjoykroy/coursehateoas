@@ -108,6 +108,30 @@ public class CourseServiceImplTest {
         verifyNoMoreInteractions(repositoryMock);
     }
 
+    @Test(expectedExceptions = CourseNotFoundException.class)
+    public void shouldThrowCourseNotFoundExceptionWhenDeletingCourseIsNotAvailable() throws Exception {
+        when(repositoryMock.findOne(INVALID_COURSE_ID)).thenReturn(null);
+
+        courseService.deleteCourse(INVALID_COURSE_ID);
+
+        verify(repositoryMock).delete(INVALID_COURSE_ID);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test
+    public void shouldDeleteACourse() throws Exception {
+        Course fakeCourse = getAFakeCourse();
+        when(repositoryMock.findOne(VALID_COURSE_ID)).thenReturn(fakeCourse);
+
+        Course deletedCourse = courseService.deleteCourse(VALID_COURSE_ID);
+
+        assertThat(deletedCourse, is(notNullValue()));
+        assertThat(deletedCourse.getId(), is(VALID_COURSE_ID));
+        verify(repositoryMock).findOne(VALID_COURSE_ID);
+        verify(repositoryMock).delete(fakeCourse);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
     // Helper
 
     private List<Course> getFakeCourses(){
