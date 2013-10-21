@@ -4,6 +4,8 @@ package com.realtech.coursehateoas.course.infrastructure.persistence;
 import com.realtech.coursehateoas.AbstractCourseHateoasRepositoryTest;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -28,7 +30,7 @@ public class CourseRepositoryIntegrationTest extends AbstractCourseHateoasReposi
     public void shouldFindAllCourses() {
         createSomeCourses();
 
-        Iterable<Course> result = repository.findAll();
+        Page<Course> result = repository.findAll(new PageRequest(1, 1));
 
         assertThat(result, is(notNullValue()));
         assertTrue(result.iterator().hasNext());
