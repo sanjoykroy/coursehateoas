@@ -16,6 +16,7 @@
         <module>coursehateoas-db</module>
         <module>coursehateoas-service</module>
         <module>coursehateoas-webapp</module>
+        <module>coursehateoas-api</module>
     </modules>
 
     <developers>
