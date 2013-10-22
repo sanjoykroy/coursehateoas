@@ -1,6 +1,7 @@
 package com.realtech.coursehateoas.course.web;
 
 
+import com.realtech.coursehateoas.api.ApplicationProtocol;
 import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import org.springframework.hateoas.Link;
@@ -29,8 +30,8 @@ public class CourseResourceAssembler extends ResourceAssemblerSupport<Course, Co
         courseResource.setWorkload(course.getWorkload());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(course.getId())).withSelfRel();
-        Link updateLink = linkTo(methodOn(CourseController.class).updateCourse(course.getId(), course)).withRel("/update");
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel("/cancel");
+        Link updateLink = linkTo(methodOn(CourseController.class).updateCourse(course.getId(), course)).withRel(ApplicationProtocol.UPDATE_ACTION_REL);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         courseResource.add(selfLink);
         courseResource.add(updateLink);
         courseResource.add(cancelLink);

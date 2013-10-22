@@ -22,7 +22,7 @@ public class IndexController {
     HttpEntity<IndexResource> getIndex(){
         IndexResource indexResource = new IndexResource();
         Link selfLink = linkTo(methodOn(IndexController.class).getIndex()).withSelfRel();
-        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel("courses");
+        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
         indexResource.add(selfLink);
         indexResource.add(coursesLink);
         return new ResponseEntity<IndexResource>(indexResource, HttpStatus.OK);

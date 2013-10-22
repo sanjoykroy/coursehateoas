@@ -1,5 +1,7 @@
 package com.realtech.coursehateoas.course.web;
 
+import com.realtech.coursehateoas.api.ApplicationProtocol;
+import com.realtech.coursehateoas.api.resources.CourseForm;
 import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.api.resources.CourseResourceCollection;
 import com.realtech.coursehateoas.course.annotation.BoundaryController;
@@ -7,17 +9,21 @@ import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.service.CourseService;
 
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
@@ -35,9 +41,8 @@ public class CourseController {
     private CourseResourceAssembler courseResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET)
-    @ResponseBody
     public HttpEntity<CourseResourceCollection> showCourses() {
-        LOGGER.info("Loading all courses");
+        LOGGER.info("Returning all courses");
 
         Iterable<Course> courses = courseService.getCourses();
         List<CourseResource> courseResources;
@@ -49,26 +54,45 @@ public class CourseController {
 
         CourseResourceCollection courseResourceCollection = new CourseResourceCollection(courseResources);
         courseResourceCollection.add(linkTo(methodOn(CourseController.class).showCourses()).withSelfRel());
+        courseResourceCollection.add(linkTo(methodOn(CourseController.class).getCreateForm()).withRel(ApplicationProtocol.FORM_REL));
+
         return new ResponseEntity<CourseResourceCollection>(courseResourceCollection, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    HttpEntity<CourseResource> createCourse(@RequestBody Course course) {
-        LOGGER.info("Creating a course - [{}]", course);
-        Course newCourse = courseService.createCourse(course);
+    @RequestMapping(value = "/form", method = RequestMethod.GET)
+    public HttpEntity<CourseForm> getCreateForm() {
+        CourseForm courseForm = new CourseForm();
+        courseForm.setTitle("");
+        courseForm.setDescription("");
+        courseForm.setInstructor("");
+        courseForm.setWorkload("");
+        courseForm.setStartDate(new DateTime().plusDays(1).toDate());
+
+        Link selfLink = linkTo(methodOn(CourseController.class).getCreateForm()).withSelfRel();
+        Link createLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("create").withRel(ApplicationProtocol.CREATE_ACTION_REL);
+        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
+        courseForm.add(Arrays.asList(selfLink, coursesLink, createLink));
+        return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
+    }
+
+
+    @RequestMapping(value = "/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public HttpEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
+        LOGGER.info("Creating a course - [{}]", form);
+        Course newCourse = courseService.createCourse(getCourseInfoFromForm(form));
         CourseResource courseResource = courseResourceAssembler.toResource(newCourse);
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    HttpEntity<CourseResource> showCourse(@PathVariable Long id) {
+    public HttpEntity<CourseResource> showCourse(@PathVariable Long id) {
         LOGGER.info("Loading a course based on id [{}]", id);
         CourseResource courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    HttpEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+    public HttpEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody Course course) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
         Course updatedCourse = courseService.updateCourse(id, course);
         CourseResource courseResource = courseResourceAssembler.toResource(updatedCourse);
@@ -76,11 +100,24 @@ public class CourseController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    HttpEntity<CourseResource> cancelCourse(@PathVariable Long id) {
+    public HttpEntity<CourseResource> cancelCourse(@PathVariable Long id) {
         LOGGER.info("Deleting a course - Course Id [{}]", id);
         Course deletedCourse = courseService.deleteCourse(id);
         CourseResource courseResource = courseResourceAssembler.toResource(deletedCourse);
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
+    }
+
+    private Course getCourseInfoFromForm(CourseForm form){
+        Course course = new Course();
+        course.setCreateDate(new Date());
+        course.setDescription(form.getDescription());
+        course.setEnabled(true);
+        course.setInstructor(form.getInstructor());
+        course.setStartDate(form.getStartDate());
+        course.setTitle(form.getTitle());
+        course.setUpdateDate(new Date());
+        course.setWorkload(form.getWorkload());
+        return course;
     }
 
     @ExceptionHandler
@@ -93,4 +130,6 @@ public class CourseController {
         }
         return responseEntity;
     }
+
+
 }
