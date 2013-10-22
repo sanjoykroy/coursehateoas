@@ -2,6 +2,7 @@ package com.realtech.coursehateoas.course.web;
 
 import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.api.resources.CourseResourceCollection;
+import com.realtech.coursehateoas.course.annotation.BoundaryController;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.service.CourseService;
@@ -9,7 +10,6 @@ import com.realtech.coursehateoas.course.service.CourseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,13 +18,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
-@Controller
+@BoundaryController
 @RequestMapping(value = "/courses", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CourseController {
 

@@ -1,12 +1,13 @@
 package com.realtech.coursehateoas.course.service;
 
+import com.realtech.coursehateoas.course.annotation.ControllerService;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("courseService")
+@ControllerService
 public class CourseServiceImpl implements CourseService {
 
     @Autowired
