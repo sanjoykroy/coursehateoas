@@ -30,7 +30,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @BoundaryController
-@RequestMapping(value = "/courses", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/courses")
 public class CourseController {
 
     private final static Logger LOGGER = LoggerFactory.getLogger(CourseController.class);
@@ -40,7 +40,8 @@ public class CourseController {
     @Autowired
     private CourseResourceAssembler courseResourceAssembler;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseResourceCollection> showCourses() {
         LOGGER.info("Returning all courses");
 
@@ -59,7 +60,9 @@ public class CourseController {
         return new ResponseEntity<CourseResourceCollection>(courseResourceCollection, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/form", method = RequestMethod.GET)
+    @RequestMapping(value = "/form",
+                    method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseForm> getCreateForm() {
         CourseForm courseForm = new CourseForm();
         courseForm.setTitle("");
@@ -76,7 +79,10 @@ public class CourseController {
     }
 
 
-    @RequestMapping(value = "/create", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/create",
+                    method = RequestMethod.POST,
+                    produces = MediaType.APPLICATION_JSON_VALUE,
+                    consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
         LOGGER.info("Creating a course - [{}]", form);
         Course newCourse = courseService.createCourse(getCourseInfoFromForm(form));
@@ -84,14 +90,19 @@ public class CourseController {
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}",
+                    method = RequestMethod.GET,
+                    produces = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseResource> showCourse(@PathVariable Long id) {
         LOGGER.info("Loading a course based on id [{}]", id);
         CourseResource courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{id}/update",
+                    method = RequestMethod.PUT,
+                    produces = MediaType.APPLICATION_JSON_VALUE,
+                    consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody Course course) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
         Course updatedCourse = courseService.updateCourse(id, course);
@@ -99,12 +110,12 @@ public class CourseController {
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    public HttpEntity<CourseResource> cancelCourse(@PathVariable Long id) {
+    @RequestMapping(value = "/{id}/cancel",
+                    method = RequestMethod.DELETE)
+    public HttpEntity cancelCourse(@PathVariable Long id) {
         LOGGER.info("Deleting a course - Course Id [{}]", id);
-        Course deletedCourse = courseService.deleteCourse(id);
-        CourseResource courseResource = courseResourceAssembler.toResource(deletedCourse);
-        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
+        courseService.deleteCourse(id);
+        return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     private Course getCourseInfoFromForm(CourseForm form){
