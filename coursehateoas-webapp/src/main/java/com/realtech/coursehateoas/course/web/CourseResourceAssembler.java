@@ -1,31 +1,39 @@
 package com.realtech.coursehateoas.course.web;
 
 
+import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import org.springframework.hateoas.Link;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.ResourceAssembler;
+import org.springframework.hateoas.mvc.ResourceAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Component
-public class CourseResourceAssembler implements ResourceAssembler<Course, Resource<Course>> {
+public class CourseResourceAssembler extends ResourceAssemblerSupport<Course, CourseResource> {
 
-    private Class<CourseController> controllerClass = CourseController.class;
+    public CourseResourceAssembler() {
+        super(CourseController.class, CourseResource.class);
+    }
 
     @Override
-    public Resource<Course> toResource(Course course) {
-        Resource<Course> courseResource = new Resource<Course>(course);
-        Link selfLink = linkTo(methodOn(controllerClass).showCourse(course.getId())).withSelfRel();
-        Link updateLink = linkTo(methodOn(controllerClass).updateCourse(course.getId(), course)).withRel("/update");
-        Link cancelLink = linkTo(methodOn(controllerClass).cancelCourse(course.getId())).withRel("/cancel");
-        Link coursesLink = linkTo(methodOn(controllerClass).showCourses()).withRel("/courses");
+    public CourseResource toResource(Course course) {
+
+        CourseResource courseResource = new CourseResource();
+        courseResource.setCourseId(course.getId());
+        courseResource.setTitle(course.getTitle());
+        courseResource.setDescription(course.getDescription());
+        courseResource.setInstructor(course.getInstructor());
+        courseResource.setStartDate(course.getStartDate());
+        courseResource.setWorkload(course.getWorkload());
+
+        Link selfLink = linkTo(methodOn(CourseController.class).showCourse(course.getId())).withSelfRel();
+        Link updateLink = linkTo(methodOn(CourseController.class).updateCourse(course.getId(), course)).withRel("/update");
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel("/cancel");
         courseResource.add(selfLink);
         courseResource.add(updateLink);
         courseResource.add(cancelLink);
-        courseResource.add(coursesLink);
         return courseResource;
     }
 }

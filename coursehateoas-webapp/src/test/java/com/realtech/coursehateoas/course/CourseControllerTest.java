@@ -1,6 +1,7 @@
 package com.realtech.coursehateoas.course;
 
 
+import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.service.CourseService;
 import com.realtech.coursehateoas.course.web.CourseController;
@@ -54,15 +55,15 @@ public class CourseControllerTest {
     @Test
     public void shouldLoadAllCourseResources() throws Exception {
         Course course = getTestCourse();
-        Page<Course> courses = new PageImpl<Course>(Arrays.asList(course));
+        Iterable<Course> courses = Arrays.asList(course);
         when(serviceMock.getCourses()).thenReturn(courses);
-        when(courseResourceAssemblerMock.toResource(course)).thenReturn(new Resource<Course>(course));
+        when(courseResourceAssemblerMock.toResources(courses)).thenReturn(Arrays.asList(new CourseResource()));
         this.mockMvc.perform(get("/courses")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(serviceMock).getCourses();
-        verify(courseResourceAssemblerMock).toResource(course);
+        verify(courseResourceAssemblerMock).toResources(courses);
     }
 
     @Test
@@ -81,7 +82,7 @@ public class CourseControllerTest {
     public void shouldLoadACourse() throws Exception {
         Course course = getTestCourse();
         when(serviceMock.getCourse(100L)).thenReturn(course);
-        when(courseResourceAssemblerMock.toResource(course)).thenReturn(new Resource<Course>(course));
+        when(courseResourceAssemblerMock.toResource(course)).thenReturn(new CourseResource());
         this.mockMvc.perform(get("/courses/100")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());

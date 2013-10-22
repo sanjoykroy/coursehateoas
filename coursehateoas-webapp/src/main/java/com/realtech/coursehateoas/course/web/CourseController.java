@@ -1,14 +1,15 @@
 package com.realtech.coursehateoas.course.web;
 
+import com.realtech.coursehateoas.api.resources.CourseResource;
+import com.realtech.coursehateoas.api.resources.CourseResourceCollection;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.service.CourseService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.hateoas.ExposesResourceFor;
-import org.springframework.hateoas.Resource;
-import org.springframework.hateoas.Resources;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,12 +19,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Controller
-@ExposesResourceFor(Course.class)
 @RequestMapping(value = "/courses", produces = MediaType.APPLICATION_JSON_VALUE)
 public class CourseController {
 
@@ -35,48 +36,52 @@ public class CourseController {
     private CourseResourceAssembler courseResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET)
-    HttpEntity<Resources<Resource<Course>>> showCourses() {
+    @ResponseBody
+    public HttpEntity<CourseResourceCollection> showCourses() {
         LOGGER.info("Loading all courses");
-        Collection<Resource<Course>> courseResourceCollection = new ArrayList<Resource<Course>>();
-        for (Course course : courseService.getCourses()) {
-            Resource<Course> courseResource = courseResourceAssembler.toResource(course);
-            courseResourceCollection.add(courseResource);
+
+        Iterable<Course> courses = courseService.getCourses();
+        List<CourseResource> courseResources;
+        if(courses != null){
+            courseResources = courseResourceAssembler.toResources(courses);
+        } else {
+            courseResources = courseResourceAssembler.toResources(new ArrayList<Course>());
         }
 
-        Resources<Resource<Course>> courseResources = new Resources<Resource<Course>>(courseResourceCollection);
-        courseResources.add(linkTo(methodOn(CourseController.class).showCourses()).withSelfRel());
-        return new ResponseEntity<Resources<Resource<Course>>>(courseResources, HttpStatus.OK);
+        CourseResourceCollection courseResourceCollection = new CourseResourceCollection(courseResources);
+        courseResourceCollection.add(linkTo(methodOn(CourseController.class).showCourses()).withSelfRel());
+        return new ResponseEntity<CourseResourceCollection>(courseResourceCollection, HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    HttpEntity<Resource<Course>> createCourse(@RequestBody Course course) {
+    HttpEntity<CourseResource> createCourse(@RequestBody Course course) {
         LOGGER.info("Creating a course - [{}]", course);
         Course newCourse = courseService.createCourse(course);
-        Resource<Course> courseResource = courseResourceAssembler.toResource(newCourse);
-        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.CREATED);
+        CourseResource courseResource = courseResourceAssembler.toResource(newCourse);
+        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
-    HttpEntity<Resource<Course>> showCourse(@PathVariable Long id) {
+    HttpEntity<CourseResource> showCourse(@PathVariable Long id) {
         LOGGER.info("Loading a course based on id [{}]", id);
-        Resource<Course> courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
-        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+        CourseResource courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
+        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    HttpEntity<Resource<Course>> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+    HttpEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody Course course) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
         Course updatedCourse = courseService.updateCourse(id, course);
-        Resource<Course> courseResource = courseResourceAssembler.toResource(updatedCourse);
-        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+        CourseResource courseResource = courseResourceAssembler.toResource(updatedCourse);
+        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-    HttpEntity<Resource<Course>> cancelCourse(@PathVariable Long id) {
+    HttpEntity<CourseResource> cancelCourse(@PathVariable Long id) {
         LOGGER.info("Deleting a course - Course Id [{}]", id);
         Course deletedCourse = courseService.deleteCourse(id);
-        Resource<Course> courseResource = courseResourceAssembler.toResource(deletedCourse);
-        return new ResponseEntity<Resource<Course>>(courseResource, HttpStatus.OK);
+        CourseResource courseResource = courseResourceAssembler.toResource(deletedCourse);
+        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
     @ExceptionHandler
