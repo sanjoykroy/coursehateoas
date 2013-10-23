@@ -15,11 +15,11 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Controller
-@RequestMapping(value = "/index", produces = ApplicationProtocol.MEDIA_TYPE)
+@RequestMapping(value = "/", produces = ApplicationProtocol.MEDIA_TYPE)
 public class IndexController {
 
     @RequestMapping(method = RequestMethod.GET)
-    HttpEntity<IndexResource> getIndex(){
+    public ResponseEntity<IndexResource> getIndex(){
         IndexResource indexResource = new IndexResource();
         Link selfLink = linkTo(methodOn(IndexController.class).getIndex()).withSelfRel();
         Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
