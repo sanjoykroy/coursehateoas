@@ -29,7 +29,7 @@
     <properties>
         <spring.version>3.2.4.RELEASE</spring.version>
         <spring.data.version>1.4.1.RELEASE</spring.data.version>
-        <spring.hateoas.version>0.7.0.RELEASE</spring.hateoas.version>
+        <spring.hateoas.version>0.8.0.RELEASE</spring.hateoas.version>
         <spring.plugin.version>0.8.0.RELEASE</spring.plugin.version>
         <spring.test.mvc.version>1.0.0.M1</spring.test.mvc.version>
         <testng.version>6.1.1</testng.version>
@@ -44,6 +44,7 @@
         <guava.version>14.0.1</guava.version>
         <jackson.databind.version>2.1.4</jackson.databind.version>
         <javax.servlet.version>3.0.1</javax.servlet.version>
+        <jayway.json.version>0.8.1</jayway.json.version>
     </properties>
 
     <dependencyManagement>
@@ -152,17 +153,19 @@
                 <scope>provided</scope>
             </dependency>
 
+
+            <dependency>
+                <groupId>com.jayway.jsonpath</groupId>
+                <artifactId>json-path</artifactId>
+                <version>${jayway.json.version}</version>
+            </dependency>
+
+
             <!-- Testing -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-test</artifactId>
                 <version>${spring.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-test-mvc</artifactId>
-                <version>${spring.test.mvc.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

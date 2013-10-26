@@ -10,7 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.server.MockMvc;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.View;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -23,10 +23,10 @@ import java.util.Date;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
 
-import static org.springframework.test.web.server.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.server.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.server.setup.MockMvcBuilders.standaloneSetup;
 
 public class CourseControllerTest {
 
@@ -67,9 +67,9 @@ public class CourseControllerTest {
     public void shouldCreateACourse() throws Exception {
         when(serviceMock.createCourse(isA(Course.class))).thenReturn(isA(Course.class));
 
-        mockMvc.perform(post("/courses")
+        mockMvc.perform(post("/courses/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(getNewCourseJson().getBytes()))
+                .content(getNewCourseJson().getBytes()))
                 .andExpect(status().isCreated());
 
         verify(serviceMock).createCourse(isA(Course.class));
@@ -97,7 +97,7 @@ public class CourseControllerTest {
 
         mockMvc.perform(put("/courses/100")
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(getCourseJson().getBytes()))
+                .content(getCourseJson().getBytes()))
                 .andExpect(status().isOk());
 
         verify(serviceMock).updateCourse(100L, course);
@@ -148,17 +148,13 @@ public class CourseControllerTest {
     }
 
     private String getNewCourseJson() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-mm-dd");
+        Date startDate = new Date();
         return "        {" +
                 "            \"title\": \"Test Course\"," +
                 "            \"description\": \"Test Course Description\"," +
                 "            \"instructor\": \"Test Instructor\"," +
-                "            \"totalPlace\": 10," +
-                "            \"createDate\": \""+df.format(FAKE_DATE)+"\"," +
-                "            \"updateDate\": \""+df.format(FAKE_DATE)+"\"," +
-                "            \"startDate\": \""+df.format(FAKE_DATE)+"\"," +
+                "            \"startDate\": \""+startDate.getTime()+"\"," +
                 "            \"workload\": \"Test work load\"," +
-                "            \"enabled\": true" +
                 "        }";
     }
 }
