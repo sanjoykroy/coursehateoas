@@ -85,7 +85,8 @@ public class CourseController {
                     consumes = MediaType.APPLICATION_JSON_VALUE)
     public HttpEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
         LOGGER.info("Creating a course - [{}]", form);
-        Course newCourse = courseService.createCourse(getCourseInfoFromForm(form));
+        Course course = getCourseInfoFromForm(form);
+        Course newCourse = courseService.createCourse(course);
         CourseResource courseResource = courseResourceAssembler.toResource(newCourse);
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
     }

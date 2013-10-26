@@ -1,7 +1,5 @@
 package com.realtech.coursehateoas.course;
 
-
-import com.realtech.coursehateoas.api.resources.CourseResource;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.service.CourseService;
 import com.realtech.coursehateoas.course.web.CourseController;
@@ -10,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.servlet.View;
 import org.testng.annotations.BeforeMethod;
@@ -20,9 +19,13 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.hamcrest.core.Is.is;
+
+
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -37,55 +40,90 @@ public class CourseControllerTest {
     @Mock
     private CourseService serviceMock;
     @Mock
-    private CourseResourceAssembler courseResourceAssemblerMock;
-    @Mock
     private View mockView;
     private MockMvc mockMvc;
 
     @BeforeMethod
     public void setup() {
         controller = new CourseController();
+        ReflectionTestUtils.setField(controller, "courseResourceAssembler" , new CourseResourceAssembler());
         MockitoAnnotations.initMocks(this);
         this.mockMvc = standaloneSetup(controller).setSingleView(mockView).build();
     }
 
     @Test
-    public void shouldLoadAllCourseResources() throws Exception {
+    public void shouldLoadAllCourses() throws Exception {
         Course course = getTestCourse();
         Iterable<Course> courses = Arrays.asList(course);
         when(serviceMock.getCourses()).thenReturn(courses);
-        when(courseResourceAssemblerMock.toResources(courses)).thenReturn(Arrays.asList(new CourseResource()));
+
         this.mockMvc.perform(get("/courses")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("add-form")))
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
+                .andExpect(jsonPath("$.content[0].links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.content[0].links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.content[0].title", is("Test Course")));
 
         verify(serviceMock).getCourses();
-        verify(courseResourceAssemblerMock).toResources(courses);
-    }
-
-    @Test(enabled = false)
-    public void shouldCreateACourse() throws Exception {
-        when(serviceMock.createCourse(isA(Course.class))).thenReturn(isA(Course.class));
-
-        mockMvc.perform(post("/courses/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getNewCourseJson().getBytes()))
-                .andExpect(status().isCreated());
-
-        verify(serviceMock).createCourse(isA(Course.class));
+        verifyNoMoreInteractions(serviceMock);
     }
 
     @Test
     public void shouldLoadACourse() throws Exception {
         Course course = getTestCourse();
         when(serviceMock.getCourse(100L)).thenReturn(course);
-        when(courseResourceAssemblerMock.toResource(course)).thenReturn(new CourseResource());
+
         this.mockMvc.perform(get("/courses/100")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.title", is("Test Course")));
 
         verify(serviceMock).getCourse(100L);
-        verify(courseResourceAssemblerMock).toResource(course);
+        verifyNoMoreInteractions(serviceMock);
+    }
+
+    @Test
+    public void shouldLoadACourseAddForm() throws Exception {
+
+        this.mockMvc.perform(get("/courses/form")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("courses")))
+                .andExpect(jsonPath("$.links[2].rel", is("create-action")))
+                .andExpect(jsonPath("$.title", is("")));
+
+        verifyZeroInteractions(serviceMock);
+    }
+
+    @Test
+    public void shouldCreateACourse() throws Exception {
+        when(serviceMock.createCourse(isA(Course.class))).thenReturn(getTestCourse());
+
+        mockMvc.perform(post("/courses/create")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("        {" +
+                        "            \"title\": \"Test Course\"," +
+                        "            \"description\": \"Test Course Description\"," +
+                        "            \"instructor\": \"Test Instructor\"," +
+                        "            \"startDate\": \""+FAKE_DATE.getTime()+"\"," +
+                        "            \"workload\": \"Test work load\"" +
+                        "        }"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.title", is("Test Course")));
+
+        verify(serviceMock).createCourse(isA(Course.class));
+        verifyNoMoreInteractions(serviceMock);
     }
 
     @Test(enabled = false)
@@ -97,7 +135,7 @@ public class CourseControllerTest {
 
         mockMvc.perform(put("/courses/100")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(getCourseJson().getBytes()))
+                .content(getCourseJson()))
                 .andExpect(status().isOk());
 
         verify(serviceMock).updateCourse(100L, course);
