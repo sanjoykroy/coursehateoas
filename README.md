@@ -3,7 +3,9 @@ COURSE-HATEOAS
 
 <p>This is an experiment project on REST Level 3</p>
 
-<p>In this project I have used one resource: Course. A course administrator can : </p>
+<p>In this project I have used one resource: Course</p>
+
+<i>A course administrator can : </i>
 
 <ol>
 <li>Create a course</li>
@@ -16,7 +18,7 @@ COURSE-HATEOAS
 <li>Copy a course</li>
 </ol>
 
-<p>A student can:</p>
+<i>A student can:</i>
 
 <ol>
 <li>Register a course</li>
@@ -50,7 +52,7 @@ $ cd coursehateoas-webapp
 $ mvn -Pjetty jetty:run
 </code></pre>
 
-The below URL is the entry point for this service
-=================================================
+Entry point for this service
+============================
 
 <p> http://localhost:8080/coursehateoas/</p>
