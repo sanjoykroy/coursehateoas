@@ -14,8 +14,6 @@ import org.springframework.web.servlet.View;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -64,7 +62,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[1].rel", is("add-form")))
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
-                .andExpect(jsonPath("$.content[0].links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.content[0].links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.content[0].links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.content[0].title", is("Test Course")));
 
@@ -81,7 +79,7 @@ public class CourseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
-                .andExpect(jsonPath("$.links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.title", is("Test Course")));
 
@@ -118,7 +116,7 @@ public class CourseControllerTest {
                         "        }"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
-                .andExpect(jsonPath("$.links[1].rel", is("update-action")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.title", is("Test Course")));
 
@@ -126,33 +124,62 @@ public class CourseControllerTest {
         verifyNoMoreInteractions(serviceMock);
     }
 
-    @Test(enabled = false)
-    public void shouldUpdateACourse() throws Exception {
+    @Test
+    public void shouldLoadACourseUpdateForm() throws Exception {
+
         Course course = getTestCourse();
-        Course updatedCourse = getTestCourse();
-        updatedCourse.setTotalPlace(25);
-        when(serviceMock.updateCourse(100L, course)).thenReturn(updatedCourse);
+        when(serviceMock.getCourse(100L)).thenReturn(course);
 
-        mockMvc.perform(put("/courses/100")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(getCourseJson()))
-                .andExpect(status().isOk());
+        this.mockMvc.perform(get("/courses/100/update-form")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("courses")))
+                .andExpect(jsonPath("$.links[2].rel", is("update-action")))
+                .andExpect(jsonPath("$.title", is("Test Course")));
 
-        verify(serviceMock).updateCourse(100L, course);
+        verify(serviceMock).getCourse(100L);
+        verifyNoMoreInteractions(serviceMock);
     }
 
-    @Test(enabled = false)
-    public void shouldDeleteACourse() throws Exception {
-        Course deletedCourse = getTestCourse();
-        when(serviceMock.deleteCourse(100L)).thenReturn(deletedCourse);
+    @Test
+    public void shouldUpdateACourse() throws Exception {
+        Course updatedCourse = getTestCourse();
+        updatedCourse.setTitle("New Title");
+        when(serviceMock.updateCourse(isA(Course.class))).thenReturn(updatedCourse);
 
-        mockMvc.perform(delete("/courses/100")
+        mockMvc.perform(put("/courses/100/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("        {" +
+                        "            \"title\": \"New Title\"," +
+                        "            \"description\": \"Test Course Description\"," +
+                        "            \"instructor\": \"Test Instructor\"," +
+                        "            \"startDate\": \""+FAKE_DATE.getTime()+"\"," +
+                        "            \"workload\": \"Test work load\"" +
+                        "        }"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-form")))
+                .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.title", is("New Title")));
+
+        verify(serviceMock).updateCourse(isA(Course.class));
+        verifyNoMoreInteractions(serviceMock);
+    }
+
+    @Test
+    public void shouldDeleteACourse() throws Exception {
+        doNothing().when(serviceMock).deleteCourse(100L);
+
+        mockMvc.perform(delete("/courses/100/cancel")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(serviceMock).deleteCourse(100L);
+        verifyNoMoreInteractions(serviceMock);
     }
 
+    // Helper Method.
 
     private Course getTestCourse() {
         Course course = new Course();
@@ -167,32 +194,5 @@ public class CourseControllerTest {
         course.setWorkload("Test work load");
         course.setEnabled(true);
         return course;
-    }
-
-    private String getCourseJson() {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy-mm-dd");
-        return "        {" +
-                "            \"id\": 100," +
-                "            \"title\": \"Test Course\"," +
-                "            \"description\": \"Test Course Description\"," +
-                "            \"instructor\": \"Test Instructor\"," +
-                "            \"totalPlace\": 25," +
-                "            \"createDate\": \""+df.format(FAKE_DATE)+"\"," +
-                "            \"updateDate\": \""+df.format(FAKE_DATE)+"\"," +
-                "            \"startDate\": \""+df.format(FAKE_DATE)+"\"," +
-                "            \"workload\": \"5 hours per week\"," +
-                "            \"enabled\": true" +
-                "        }";
-    }
-
-    private String getNewCourseJson() {
-        Date startDate = new Date();
-        return "        {" +
-                "            \"title\": \"Test Course\"," +
-                "            \"description\": \"Test Course Description\"," +
-                "            \"instructor\": \"Test Instructor\"," +
-                "            \"startDate\": \""+startDate.getTime()+"\"," +
-                "            \"workload\": \"Test work load\"," +
-                "        }";
     }
 }

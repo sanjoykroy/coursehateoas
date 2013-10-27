@@ -42,7 +42,7 @@ public class CourseController {
 
     @RequestMapping(method = RequestMethod.GET,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<CourseResourceCollection> showCourses() {
+    public ResponseEntity<CourseResourceCollection> showCourses() {
         LOGGER.info("Returning all courses");
 
         Iterable<Course> courses = courseService.getCourses();
@@ -63,7 +63,7 @@ public class CourseController {
     @RequestMapping(value = "/form",
                     method = RequestMethod.GET,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<CourseForm> getCreateForm() {
+    public ResponseEntity<CourseForm> getCreateForm() {
         CourseForm courseForm = new CourseForm();
         courseForm.setTitle("");
         courseForm.setDescription("");
@@ -83,7 +83,7 @@ public class CourseController {
                     method = RequestMethod.POST,
                     produces = MediaType.APPLICATION_JSON_VALUE,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
+    public ResponseEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
         LOGGER.info("Creating a course - [{}]", form);
         Course course = getCourseInfoFromForm(form);
         Course newCourse = courseService.createCourse(course);
@@ -94,26 +94,49 @@ public class CourseController {
     @RequestMapping(value = "/{id}",
                     method = RequestMethod.GET,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<CourseResource> showCourse(@PathVariable Long id) {
+    public ResponseEntity<CourseResource> showCourse(@PathVariable Long id) {
         LOGGER.info("Loading a course based on id [{}]", id);
         CourseResource courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/update-form",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<CourseForm> getUpdateForm(@PathVariable Long id) {
+
+        Course courseToBeUpdated = courseService.getCourse(id);
+
+        CourseForm courseForm = new CourseForm();
+        courseForm.setTitle(courseToBeUpdated.getTitle());
+        courseForm.setDescription(courseToBeUpdated.getDescription());
+        courseForm.setInstructor(courseToBeUpdated.getInstructor());
+        courseForm.setWorkload(courseToBeUpdated.getWorkload());
+        courseForm.setStartDate(courseToBeUpdated.getStartDate());
+
+        Link selfLink = linkTo(methodOn(CourseController.class).showCourse(courseToBeUpdated.getId())).withSelfRel();
+        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
+        Link updateLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("/"+courseToBeUpdated.getId()+"/update").withRel(ApplicationProtocol.UPDATE_ACTION_REL);
+        courseForm.add(Arrays.asList(selfLink, coursesLink, updateLink));
+        return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/update",
                     method = RequestMethod.PUT,
                     produces = MediaType.APPLICATION_JSON_VALUE,
                     consumes = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody Course course) {
+    public ResponseEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody CourseForm form) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
-        Course updatedCourse = courseService.updateCourse(id, course);
+        Course course = getCourseInfoFromForm(form);
+        course.setId(id);
+        Course updatedCourse = courseService.updateCourse(course);
         CourseResource courseResource = courseResourceAssembler.toResource(updatedCourse);
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/cancel",
                     method = RequestMethod.DELETE)
-    public HttpEntity cancelCourse(@PathVariable Long id) {
+    public ResponseEntity cancelCourse(@PathVariable Long id) {
         LOGGER.info("Deleting a course - Course Id [{}]", id);
         courseService.deleteCourse(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);

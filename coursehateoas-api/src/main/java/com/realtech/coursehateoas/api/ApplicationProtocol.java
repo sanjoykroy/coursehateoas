@@ -11,6 +11,8 @@ public class ApplicationProtocol {
 
     public static final String FORM_REL = "add-form";
 
+    public static final String UPDATE_FORM_REL = "update-form";
+
     public static final String CREATE_ACTION_REL = "create-action";
 
     public static final String UPDATE_ACTION_REL = "update-action";

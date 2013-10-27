@@ -87,7 +87,7 @@ public class CourseServiceImplTest {
     public void shouldThrowCourseNotFoundExceptionWhenUpdatingCourseIsNotAvailable() throws Exception {
         when(repositoryMock.findOne(INVALID_COURSE_ID)).thenReturn(null);
 
-        courseService.updateCourse(INVALID_COURSE_ID, getAFakeCourse());
+        courseService.updateCourse(getAFakeCourse());
 
         verify(repositoryMock).findOne(INVALID_COURSE_ID);
         verifyNoMoreInteractions(repositoryMock);
@@ -96,15 +96,15 @@ public class CourseServiceImplTest {
     @Test
     public void shouldUpdateACourse() throws Exception {
         Course fakeCourse = getAFakeCourse();
-        when(repositoryMock.findOne(VALID_COURSE_ID)).thenReturn(fakeCourse);
-        when(repositoryMock.save(fakeCourse)).thenReturn(fakeCourse);
+        when(repositoryMock.findOne(fakeCourse.getId())).thenReturn(fakeCourse);
+        when(repositoryMock.saveAndFlush(fakeCourse)).thenReturn(fakeCourse);
 
-        Course actual = courseService.updateCourse(VALID_COURSE_ID, fakeCourse);
+        Course actual = courseService.updateCourse(fakeCourse);
 
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getId(), is(VALID_COURSE_ID));
         verify(repositoryMock).findOne(VALID_COURSE_ID);
-        verify(repositoryMock).save(fakeCourse);
+        verify(repositoryMock).saveAndFlush(fakeCourse);
         verifyNoMoreInteractions(repositoryMock);
     }
 
@@ -123,10 +123,8 @@ public class CourseServiceImplTest {
         Course fakeCourse = getAFakeCourse();
         when(repositoryMock.findOne(VALID_COURSE_ID)).thenReturn(fakeCourse);
 
-        Course deletedCourse = courseService.deleteCourse(VALID_COURSE_ID);
+        courseService.deleteCourse(VALID_COURSE_ID);
 
-        assertThat(deletedCourse, is(notNullValue()));
-        assertThat(deletedCourse.getId(), is(VALID_COURSE_ID));
         verify(repositoryMock).findOne(VALID_COURSE_ID);
         verify(repositoryMock).delete(fakeCourse);
         verifyNoMoreInteractions(repositoryMock);

@@ -5,7 +5,8 @@ import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+
+import java.util.Date;
 
 @ControllerService
 public class CourseServiceImpl implements CourseService {
@@ -34,25 +35,31 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course updateCourse(Long id, Course aCourse) throws CourseNotFoundException {
-        Course existedCourse = this.getCourse(id);
-        return repository.save(populateExistedCourseWithNewData(existedCourse, aCourse));
+    public Course updateCourse(Course aCourse) throws CourseNotFoundException {
+        Course existedCourse = this.getCourse(aCourse.getId());
+        if(existedCourse == null){
+            throw new CourseNotFoundException("Course is not found.");
+        } else {
+            return repository.saveAndFlush(populateExistedCourseWithNewData(existedCourse, aCourse));
+        }
     }
 
     @Override
-    public Course deleteCourse(Long id) throws CourseNotFoundException {
+    public void deleteCourse(Long id) throws CourseNotFoundException {
         Course existedCourse = this.getCourse(id);
-        repository.delete(existedCourse);
-        return existedCourse;
+        if(existedCourse == null){
+            throw new CourseNotFoundException("Course is not found.");
+        } else {
+            repository.delete(existedCourse);
+        }
     }
 
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {
         existedCourse.setTitle(aCourse.getTitle());
         existedCourse.setDescription(aCourse.getDescription());
-        existedCourse.setUpdateDate(aCourse.getUpdateDate());
+        existedCourse.setUpdateDate(new Date());
         existedCourse.setInstructor(aCourse.getInstructor());
         existedCourse.setStartDate(aCourse.getStartDate());
-        existedCourse.setTotalPlace(aCourse.getTotalPlace());
         existedCourse.setWorkload(aCourse.getWorkload());
         return existedCourse;
     }
