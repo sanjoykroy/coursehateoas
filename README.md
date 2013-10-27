@@ -1,17 +1,28 @@
 COURSE-HATEOAS
 ============
 
-<p>This is an experiment project. In this project I have used Spring HATEOAS.</p>
+<p>This is an experiment project on REST Level 3</p>
 
-<p>I have used one resource: Course. The below operations will be performed on this resource:</p>
+<p>In this project I have used one resource: Course. A course administrator can : </p>
 
 <ol>
-<li>createCourse - POST operation to create a course</li>
-<li>showCourses - GET operation to retrieve all courses</li>
-<li>showCourse - GET operation to retrieve a single course</li>
-<li>updateCourse - PUT operation to update a course</li>
-<li>cancelCourse - DELETE operation to cancel a course</li>
+<li>Create a course</li>
+<li>View a course</li>
+<li>Update a course</li>
+<li>Approve a course</li>
+<li>Publish a course</li>
+<li>Block a course</li>
+<li>Cancel a course</li>
+<li>Copy a course</li>
 </ol>
+
+<p>A student can:</p>
+
+<ol>
+<li>Register a course</li>
+<li>Unregister a course</li>
+</ol>
+
 
 <p>This project uses:</p>
 
@@ -36,10 +47,10 @@ To run the application
 $ cd coursehateoas
 $ mvn clean install
 $ cd coursehateoas-webapp
-$ mvn clean install -Pjetty jetty:run
+$ mvn -Pjetty jetty:run
 </code></pre>
 
-To see the application in action
-================================
+The below URL is the entry point for this service
+=================================================
 
-<p> http://localhost:8080/coursehateoas/courses </p>
+<p> http://localhost:8080/coursehateoas/</p>
