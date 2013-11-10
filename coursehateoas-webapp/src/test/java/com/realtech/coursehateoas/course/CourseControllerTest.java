@@ -7,6 +7,8 @@ import com.realtech.coursehateoas.course.web.CourseResourceAssembler;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,6 +25,7 @@ import static org.hamcrest.core.Is.is;
 
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,10 +55,10 @@ public class CourseControllerTest {
     @Test
     public void shouldLoadAllCourses() throws Exception {
         Course course = getTestCourse();
-        Iterable<Course> courses = Arrays.asList(course);
-        when(serviceMock.getCourses()).thenReturn(courses);
+        Page<Course> courses =  new PageImpl<Course>(Arrays.asList(course));
+        when(serviceMock.getPaginatedCourses(1,1)).thenReturn(courses);
 
-        this.mockMvc.perform(get("/courses")
+        this.mockMvc.perform(get("/courses?page=1&pageSize=1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
@@ -66,7 +69,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.content[0].links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.content[0].title", is("Test Course")));
 
-        verify(serviceMock).getCourses();
+        verify(serviceMock).getPaginatedCourses(1, 1);
         verifyNoMoreInteractions(serviceMock);
     }
 

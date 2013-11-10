@@ -9,10 +9,12 @@ import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.service.CourseService;
 
+import com.realtech.coursehateoas.course.support.NavigationLinkBuilder;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.HttpEntity;
@@ -42,20 +44,25 @@ public class CourseController {
 
     @RequestMapping(method = RequestMethod.GET,
                     produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<CourseResourceCollection> showCourses() {
+    public ResponseEntity<CourseResourceCollection> showCourses(
+               @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+               @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
+
         LOGGER.info("Returning all courses");
 
-        Iterable<Course> courses = courseService.getCourses();
+        Page<Course> courses = courseService.getPaginatedCourses(page, pageSize);
+
         List<CourseResource> courseResources;
         if(courses != null){
-            courseResources = courseResourceAssembler.toResources(courses);
+            courseResources = courseResourceAssembler.toResources(courses.getContent());
         } else {
             courseResources = courseResourceAssembler.toResources(new ArrayList<Course>());
         }
 
         CourseResourceCollection courseResourceCollection = new CourseResourceCollection(courseResources);
-        courseResourceCollection.add(linkTo(methodOn(CourseController.class).showCourses()).withSelfRel());
         courseResourceCollection.add(linkTo(methodOn(CourseController.class).getCreateForm()).withRel(ApplicationProtocol.FORM_REL));
+
+        NavigationLinkBuilder.addNavigationLinks(courseResourceCollection, courses);
 
         return new ResponseEntity<CourseResourceCollection>(courseResourceCollection, HttpStatus.OK);
     }
@@ -73,7 +80,7 @@ public class CourseController {
 
         Link selfLink = linkTo(methodOn(CourseController.class).getCreateForm()).withSelfRel();
         Link createLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("create").withRel(ApplicationProtocol.CREATE_ACTION_REL);
-        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
+        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses(1, 10)).withRel(ApplicationProtocol.COURSES_REL);
         courseForm.add(Arrays.asList(selfLink, coursesLink, createLink));
         return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
     }
@@ -115,7 +122,7 @@ public class CourseController {
         courseForm.setStartDate(courseToBeUpdated.getStartDate());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(courseToBeUpdated.getId())).withSelfRel();
-        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses()).withRel(ApplicationProtocol.COURSES_REL);
+        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses(1, 10)).withRel(ApplicationProtocol.COURSES_REL);
         Link updateLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("/"+courseToBeUpdated.getId()+"/update").withRel(ApplicationProtocol.UPDATE_ACTION_REL);
         courseForm.add(Arrays.asList(selfLink, coursesLink, updateLink));
         return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
