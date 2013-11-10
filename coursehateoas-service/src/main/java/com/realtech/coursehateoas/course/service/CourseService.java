@@ -3,11 +3,14 @@ package com.realtech.coursehateoas.course.service;
 
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
+import org.springframework.data.domain.Page;
 
 
 public interface CourseService {
 
     Iterable<Course> getCourses();
+
+    Page<Course> getPaginatedCourses(int page, int pageSize);
 
     Course getCourse(Long id) throws CourseNotFoundException;
 

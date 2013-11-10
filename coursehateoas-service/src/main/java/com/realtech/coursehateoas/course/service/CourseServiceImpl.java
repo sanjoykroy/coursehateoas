@@ -5,6 +5,9 @@ import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.Date;
 
@@ -52,6 +55,12 @@ public class CourseServiceImpl implements CourseService {
         } else {
             repository.delete(existedCourse);
         }
+    }
+
+    @Override
+    public Page<Course> getPaginatedCourses(int page, int pageSize) {
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        return repository.findAll(new PageRequest(page, pageSize, sort));
     }
 
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {

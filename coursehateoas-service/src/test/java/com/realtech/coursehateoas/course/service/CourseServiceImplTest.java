@@ -6,13 +6,16 @@ import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
-
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -130,10 +133,25 @@ public class CourseServiceImplTest {
         verifyNoMoreInteractions(repositoryMock);
     }
 
+    @Test
+    public void shouldReturnPaginatedCourses() throws Exception {
+        when(repositoryMock.findAll(Mockito.any(PageRequest.class))).thenReturn(getPaginatedFakeCourses());
+
+        Page<Course> actual = courseService.getPaginatedCourses(1, 1);
+
+        assertThat(actual, is(notNullValue()));
+        verify(repositoryMock).findAll(Mockito.any(PageRequest.class));
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
     // Helper
 
     private List<Course> getFakeCourses(){
         return Arrays.asList(getAFakeCourse());
+    }
+
+    private Page<Course> getPaginatedFakeCourses(){
+        return new PageImpl<Course>(Arrays.asList(getAFakeCourse()));
     }
 
     private Course getAFakeCourse(){
