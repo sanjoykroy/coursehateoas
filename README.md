@@ -56,3 +56,9 @@ Entry point for this service
 ============================
 
 <p> http://localhost:8080/coursehateoas/</p>
+
+<p>Use any Rest Client (such as Chrome POSTMAN, Advanced REST Client) to access the service</p>
+
+<p>Please add the below header:</p>
+
+<p>Content-Type: application/vnd.thin+json</p>
