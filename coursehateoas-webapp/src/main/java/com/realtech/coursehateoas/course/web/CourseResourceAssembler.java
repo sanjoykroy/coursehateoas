@@ -28,6 +28,7 @@ public class CourseResourceAssembler extends ResourceAssemblerSupport<Course, Co
         courseResource.setInstructor(course.getInstructor());
         courseResource.setStartDate(course.getStartDate());
         courseResource.setWorkload(course.getWorkload());
+        courseResource.setCreatedDate(course.getCreateDate());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(course.getId())).withSelfRel();
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);

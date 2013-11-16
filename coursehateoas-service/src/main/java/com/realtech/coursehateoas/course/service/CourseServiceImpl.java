@@ -60,7 +60,7 @@ public class CourseServiceImpl implements CourseService {
     @Override
     public Page<Course> getPaginatedCourses(int page, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
-        return repository.findAll(new PageRequest(page, pageSize));
+        return repository.findAll(new PageRequest(page, pageSize, sort));
     }
 
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {

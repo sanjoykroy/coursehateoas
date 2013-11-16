@@ -14,7 +14,7 @@ import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.methodOn;
 
 @Controller
-@RequestMapping(value = "/", produces = ApplicationProtocol.MEDIA_TYPE)
+@RequestMapping(value = "/", produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
 public class IndexController {
 
     @RequestMapping(method = RequestMethod.GET)

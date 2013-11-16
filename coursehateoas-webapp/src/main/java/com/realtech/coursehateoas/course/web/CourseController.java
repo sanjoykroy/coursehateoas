@@ -43,7 +43,7 @@ public class CourseController {
     private CourseResourceAssembler courseResourceAssembler;
 
     @RequestMapping(method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+                    produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseResourceCollection> showCourses(
                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
@@ -69,7 +69,7 @@ public class CourseController {
 
     @RequestMapping(value = "/form",
                     method = RequestMethod.GET,
-                    produces = MediaType.APPLICATION_JSON_VALUE)
+                    produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseForm> getCreateForm() {
         CourseForm courseForm = new CourseForm();
         courseForm.setTitle("");
@@ -88,8 +88,8 @@ public class CourseController {
 
     @RequestMapping(value = "/create",
                     method = RequestMethod.POST,
-                    produces = MediaType.APPLICATION_JSON_VALUE,
-                    consumes = MediaType.APPLICATION_JSON_VALUE)
+                    produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON,
+                    consumes = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
         LOGGER.info("Creating a course - [{}]", form);
         Course course = getCourseInfoFromForm(form);
@@ -111,7 +111,7 @@ public class CourseController {
 
     @RequestMapping(value = "/{id}/update-form",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseForm> getUpdateForm(@PathVariable Long id) {
 
         Course courseToBeUpdated = courseService.getCourse(id);
@@ -132,8 +132,8 @@ public class CourseController {
 
     @RequestMapping(value = "/{id}/update",
                     method = RequestMethod.PUT,
-                    produces = MediaType.APPLICATION_JSON_VALUE,
-                    consumes = MediaType.APPLICATION_JSON_VALUE)
+                    produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON,
+                    consumes = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody CourseForm form) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
         Course course = getCourseInfoFromForm(form);

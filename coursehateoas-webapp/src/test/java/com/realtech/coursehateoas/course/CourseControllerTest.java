@@ -1,5 +1,6 @@
 package com.realtech.coursehateoas.course;
 
+import com.realtech.coursehateoas.api.ApplicationProtocol;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.service.CourseService;
 import com.realtech.coursehateoas.course.web.CourseController;
@@ -59,7 +60,7 @@ public class CourseControllerTest {
         when(serviceMock.getPaginatedCourses(1,1)).thenReturn(courses);
 
         this.mockMvc.perform(get("/courses?page=1&pageSize=1")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("add-form")))
                 .andExpect(jsonPath("$.links[1].rel", is("self")))
@@ -79,7 +80,7 @@ public class CourseControllerTest {
         when(serviceMock.getCourse(100L)).thenReturn(course);
 
         this.mockMvc.perform(get("/courses/100")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("update-form")))
@@ -94,7 +95,7 @@ public class CourseControllerTest {
     public void shouldLoadACourseAddForm() throws Exception {
 
         this.mockMvc.perform(get("/courses/form")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("courses")))
@@ -109,7 +110,7 @@ public class CourseControllerTest {
         when(serviceMock.createCourse(isA(Course.class))).thenReturn(getTestCourse());
 
         mockMvc.perform(post("/courses/create")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON))
                 .content("        {" +
                         "            \"title\": \"Test Course\"," +
                         "            \"description\": \"Test Course Description\"," +
@@ -135,7 +136,7 @@ public class CourseControllerTest {
         when(serviceMock.getCourse(100L)).thenReturn(course);
 
         this.mockMvc.perform(get("/courses/100/update-form")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("courses")))
@@ -153,7 +154,7 @@ public class CourseControllerTest {
         when(serviceMock.updateCourse(isA(Course.class))).thenReturn(updatedCourse);
 
         mockMvc.perform(put("/courses/100/update")
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON))
                 .content("        {" +
                         "            \"title\": \"New Title\"," +
                         "            \"description\": \"Test Course Description\"," +
@@ -176,7 +177,7 @@ public class CourseControllerTest {
         doNothing().when(serviceMock).deleteCourse(100L);
 
         mockMvc.perform(delete("/courses/100/cancel")
-                .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isNoContent());
 
         verify(serviceMock).deleteCourse(100L);

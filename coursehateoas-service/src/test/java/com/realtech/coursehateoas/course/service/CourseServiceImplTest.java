@@ -15,7 +15,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -42,8 +41,7 @@ public class CourseServiceImplTest {
 
     @Test
     public void shouldReturnAllCourses() throws Exception {
-        PageRequest pageRequest = new PageRequest(1, 10);
-        when(repositoryMock.findAll(pageRequest)).thenReturn(getFakeCourses());
+        when(repositoryMock.findAll(Mockito.any(PageRequest.class))).thenReturn(getFakeCourses());
 
         Iterable<Course> actual = courseService.getCourses();
 
