@@ -42,7 +42,8 @@ public class CourseServiceImplTest {
 
     @Test
     public void shouldReturnAllCourses() throws Exception {
-        when(repositoryMock.findAll()).thenReturn(getFakeCourses());
+        PageRequest pageRequest = new PageRequest(1, 10);
+        when(repositoryMock.findAll(pageRequest)).thenReturn(getFakeCourses());
 
         Iterable<Course> actual = courseService.getCourses();
 
@@ -146,8 +147,8 @@ public class CourseServiceImplTest {
 
     // Helper
 
-    private List<Course> getFakeCourses(){
-        return Arrays.asList(getAFakeCourse());
+    private Page<Course> getFakeCourses(){
+        return new PageImpl<Course>(Arrays.asList(getAFakeCourse()));
     }
 
     private Page<Course> getPaginatedFakeCourses(){

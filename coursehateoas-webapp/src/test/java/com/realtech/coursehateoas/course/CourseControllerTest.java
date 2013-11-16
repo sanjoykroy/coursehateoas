@@ -61,8 +61,8 @@ public class CourseControllerTest {
         this.mockMvc.perform(get("/courses?page=1&pageSize=1")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.links[0].rel", is("self")))
-                .andExpect(jsonPath("$.links[1].rel", is("add-form")))
+                .andExpect(jsonPath("$.links[0].rel", is("add-form")))
+                .andExpect(jsonPath("$.links[1].rel", is("self")))
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
                 .andExpect(jsonPath("$.content[0].links[1].rel", is("update-form")))
@@ -121,6 +121,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.links[3].rel", is("courses")))
                 .andExpect(jsonPath("$.title", is("Test Course")));
 
         verify(serviceMock).createCourse(isA(Course.class));

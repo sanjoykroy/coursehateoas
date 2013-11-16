@@ -80,7 +80,7 @@ public class CourseController {
 
         Link selfLink = linkTo(methodOn(CourseController.class).getCreateForm()).withSelfRel();
         Link createLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("create").withRel(ApplicationProtocol.CREATE_ACTION_REL);
-        Link coursesLink = linkTo(methodOn(CourseController.class).showCourses(1, 10)).withRel(ApplicationProtocol.COURSES_REL);
+        Link coursesLink = linkTo(CourseController.class).withRel(ApplicationProtocol.COURSES_REL);
         courseForm.add(Arrays.asList(selfLink, coursesLink, createLink));
         return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
     }
@@ -95,6 +95,8 @@ public class CourseController {
         Course course = getCourseInfoFromForm(form);
         Course newCourse = courseService.createCourse(course);
         CourseResource courseResource = courseResourceAssembler.toResource(newCourse);
+        Link coursesLink = linkTo(CourseController.class).withRel(ApplicationProtocol.COURSES_REL);
+        courseResource.add(coursesLink);
         return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
     }
 
