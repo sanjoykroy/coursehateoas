@@ -21,6 +21,7 @@ public class Course {
     private Date startDate;
     private String workload;
     private boolean enabled;
+    private Status status;
 
     public Long getId() {
         return id;
@@ -100,6 +101,14 @@ public class Course {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override
