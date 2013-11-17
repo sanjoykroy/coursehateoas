@@ -3,9 +3,11 @@ package com.realtech.coursehateoas.course.infrastructure.persistence;
 
 import com.realtech.coursehateoas.AbstractCourseHateoasRepositoryTest;
 import com.realtech.coursehateoas.course.domain.model.Course;
+import com.realtech.coursehateoas.course.domain.model.CourseStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.testng.annotations.Test;
 
 import java.util.Date;
@@ -22,15 +24,16 @@ public class CourseRepositoryIntegrationTest extends AbstractCourseHateoasReposi
 
     @Test
     public void shouldSaveACourse() {
-        Course savedCourse = repository.save(new Course());
+        Course savedCourse = createCourse("course1", "description1");
         assertThat(savedCourse.getId(), is(notNullValue()));
     }
 
     @Test
     public void shouldFindAllCourses() {
-        createSomeCourses();
+        repository.save(createCourse("course1", "description1"));
 
-        Page<Course> result = repository.findAll(new PageRequest(1, 1));
+        Sort sort = new Sort(Sort.Direction.DESC, "createDate");
+        Page<Course> result = repository.findAll(new PageRequest(0, 10, sort));
 
         assertThat(result, is(notNullValue()));
         assertTrue(result.iterator().hasNext());
@@ -45,6 +48,7 @@ public class CourseRepositoryIntegrationTest extends AbstractCourseHateoasReposi
         assertThat(savedCourse.getId(), is(notNullValue()));
         assertThat(savedCourse.getTitle(), is("course1"));
         assertThat(savedCourse.getDescription(), is("description1"));
+        assertThat(savedCourse.getCourseStatus(), is(CourseStatus.NEW));
     }
 
     // Helper Methods
@@ -61,7 +65,10 @@ public class CourseRepositoryIntegrationTest extends AbstractCourseHateoasReposi
         course.setCreateDate(new Date());
         course.setUpdateDate(new Date());
         course.setStartDate(new Date());
+        course.setInstructor("testInstructor");
         course.setEnabled(true);
+        course.setCourseStatus(CourseStatus.NEW);
+        course.setWorkload("10 hours");
         return repository.save(course);
     }
 }

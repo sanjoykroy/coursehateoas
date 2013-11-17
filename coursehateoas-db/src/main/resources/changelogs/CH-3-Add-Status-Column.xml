@@ -7,7 +7,7 @@
     <changeSet id="CH-3-Add-Status-Column" author="sanjoy.roy">
         <sql><![CDATA[
 
-                ALTER TABLE COURSE ADD STATUS VARCHAR(100);
+                ALTER TABLE COURSE ADD COURSE_STATUS VARCHAR(100) NOT NULL;
             ]]>
         </sql>
     </changeSet>

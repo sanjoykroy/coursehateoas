@@ -21,22 +21,23 @@ public class CourseResourceAssembler extends ResourceAssemblerSupport<Course, Co
     @Override
     public CourseResource toResource(Course course) {
 
-        CourseResource courseResource = new CourseResource();
-        courseResource.setCourseId(course.getId());
-        courseResource.setTitle(course.getTitle());
-        courseResource.setDescription(course.getDescription());
-        courseResource.setInstructor(course.getInstructor());
-        courseResource.setStartDate(course.getStartDate());
-        courseResource.setWorkload(course.getWorkload());
-        courseResource.setCreatedDate(course.getCreateDate());
+        CourseResource resource = new CourseResource();
+        resource.setCourseId(course.getId());
+        resource.setTitle(course.getTitle());
+        resource.setDescription(course.getDescription());
+        resource.setInstructor(course.getInstructor());
+        resource.setStartDate(course.getStartDate());
+        resource.setWorkload(course.getWorkload());
+        resource.setCreatedDate(course.getCreateDate());
+        resource.setStatus(course.getCourseStatus().name());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(course.getId())).withSelfRel();
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
         Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
-        courseResource.add(selfLink);
-        courseResource.add(updateLink);
-        courseResource.add(cancelLink);
-        return courseResource;
+        resource.add(selfLink);
+        resource.add(updateLink);
+        resource.add(cancelLink);
+        return resource;
     }
 }
 

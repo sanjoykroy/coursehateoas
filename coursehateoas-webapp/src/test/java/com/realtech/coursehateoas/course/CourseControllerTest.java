@@ -2,6 +2,7 @@ package com.realtech.coursehateoas.course;
 
 import com.realtech.coursehateoas.api.ApplicationProtocol;
 import com.realtech.coursehateoas.course.domain.model.Course;
+import com.realtech.coursehateoas.course.domain.model.CourseStatus;
 import com.realtech.coursehateoas.course.service.CourseService;
 import com.realtech.coursehateoas.course.web.CourseController;
 import com.realtech.coursehateoas.course.web.CourseResourceAssembler;
@@ -26,7 +27,6 @@ import static org.hamcrest.core.Is.is;
 
 
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -198,6 +198,7 @@ public class CourseControllerTest {
         course.setTotalPlace(10);
         course.setWorkload("Test work load");
         course.setEnabled(true);
+        course.setCourseStatus(CourseStatus.NEW);
         return course;
     }
 }

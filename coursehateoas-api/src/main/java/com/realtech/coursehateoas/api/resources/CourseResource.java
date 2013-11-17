@@ -14,6 +14,7 @@ public class CourseResource extends ResourceSupport {
     private Date startDate;
     private String workload;
     private Date createdDate;
+    private String status;
 
     public Long getCourseId() {
         return courseId;
@@ -71,6 +72,14 @@ public class CourseResource extends ResourceSupport {
         this.createdDate = createdDate;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -101,6 +110,7 @@ public class CourseResource extends ResourceSupport {
                 ", startDate=" + startDate +
                 ", workload='" + workload + '\'' +
                 ", createdDate=" + createdDate +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

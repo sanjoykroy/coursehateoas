@@ -6,5 +6,7 @@
 
     <include file="changelogs/CH-1-Create-Course-Table.xml" />
     <include file="changelogs/CH-2-Insert-Initial-Course-Data.xml" />
+    <include file="changelogs/CH-3-Add-Status-Column.xml" />
+    <include file="changelogs/CH-4-Update-Existing-Courses-With-Status.xml" />
 
 </databaseChangeLog>

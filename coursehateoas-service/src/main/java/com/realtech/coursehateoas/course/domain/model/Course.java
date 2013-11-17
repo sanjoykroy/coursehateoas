@@ -9,19 +9,30 @@ public class Course {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Column(name = "title", nullable = false)
     private String title;
+    @Column(name = "description", nullable = false)
     private String description;
+    @Column(name = "instructor", nullable = false)
     private String instructor;
+    @Column(name = "totalplace", nullable = false)
     private int totalPlace;
+    @Column(name = "createdate", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date createDate;
+    @Column(name = "updatedate", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date updateDate;
+    @Column(name = "startdate", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date startDate;
+    @Column(name = "workload", nullable = false)
     private String workload;
+    @Column(name = "enabled", nullable = false)
     private boolean enabled;
-    private Status status;
+    @Column(name = "course_status")
+    @Enumerated(EnumType.STRING)
+    private CourseStatus courseStatus;
 
     public Long getId() {
         return id;
@@ -103,12 +114,12 @@ public class Course {
         this.enabled = enabled;
     }
 
-    public Status getStatus() {
-        return status;
+    public CourseStatus getCourseStatus() {
+        return courseStatus;
     }
 
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setCourseStatus(CourseStatus courseStatus) {
+        this.courseStatus = courseStatus;
     }
 
     @Override
@@ -144,6 +155,7 @@ public class Course {
                 ", startDate=" + startDate +
                 ", workload='" + workload + '\'' +
                 ", enabled=" + enabled +
+                ", courseStatus=" + courseStatus +
                 '}';
     }
 }

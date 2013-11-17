@@ -2,6 +2,7 @@ package com.realtech.coursehateoas.course.service;
 
 import com.realtech.coursehateoas.course.annotation.ControllerService;
 import com.realtech.coursehateoas.course.domain.model.Course;
+import com.realtech.coursehateoas.course.domain.model.CourseStatus;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public Course createCourse(Course aCourse) {
+        aCourse.setCourseStatus(CourseStatus.NEW);
         return repository.save(aCourse);
     }
 
