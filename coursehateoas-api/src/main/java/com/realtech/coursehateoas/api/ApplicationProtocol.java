@@ -16,4 +16,6 @@ public class ApplicationProtocol {
 
     public static final String CANCEL_ACTION_REL = "cancel-action";
 
+    public static final String APPROVE_ACTION_REL = "approve-action";
+
 }

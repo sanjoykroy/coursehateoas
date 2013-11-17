@@ -2,7 +2,9 @@ package com.realtech.coursehateoas.course.service;
 
 
 import com.realtech.coursehateoas.course.domain.model.Course;
+import com.realtech.coursehateoas.course.domain.model.CourseStatus;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
+import com.realtech.coursehateoas.course.exception.IllegalCourseActionException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -140,6 +142,41 @@ public class CourseServiceImplTest {
 
         assertThat(actual, is(notNullValue()));
         verify(repositoryMock).findAll(Mockito.any(PageRequest.class));
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test(expectedExceptions = CourseNotFoundException.class)
+    public void shouldThrowCourseNotFoundExceptionIfCourseIsNotFoundToApprove() throws Exception{
+        when(repositoryMock.findOne(100L)).thenReturn(null);
+
+        courseService.approveCourse(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test(expectedExceptions = IllegalCourseActionException.class)
+    public void shouldThrowIllegalCourseExceptionIfCourseIsNotEligibleToApprove() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.APPROVED);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.approveCourse(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test
+    public void shouldApproveACourse() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.NEW);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.approveCourse(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verify(repositoryMock).saveAndFlush(fakeCourse);
         verifyNoMoreInteractions(repositoryMock);
     }
 

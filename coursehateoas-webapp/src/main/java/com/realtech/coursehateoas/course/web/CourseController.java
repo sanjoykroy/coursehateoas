@@ -52,37 +52,37 @@ public class CourseController {
 
         Page<Course> courses = courseService.getPaginatedCourses(page, pageSize);
 
-        List<CourseResource> courseResources;
+        List<CourseResource> resources;
         if(courses != null){
-            courseResources = courseResourceAssembler.toResources(courses.getContent());
+            resources = courseResourceAssembler.toResources(courses.getContent());
         } else {
-            courseResources = courseResourceAssembler.toResources(new ArrayList<Course>());
+            resources = courseResourceAssembler.toResources(new ArrayList<Course>());
         }
 
-        CourseResourceCollection courseResourceCollection = new CourseResourceCollection(courseResources);
-        courseResourceCollection.add(linkTo(methodOn(CourseController.class).getCreateForm()).withRel(ApplicationProtocol.FORM_REL));
+        CourseResourceCollection collection = new CourseResourceCollection(resources);
+        collection.add(linkTo(methodOn(CourseController.class).getCreateForm()).withRel(ApplicationProtocol.FORM_REL));
 
-        NavigationLinkBuilder.addNavigationLinks(courseResourceCollection, courses);
+        NavigationLinkBuilder.addNavigationLinks(collection, courses);
 
-        return new ResponseEntity<CourseResourceCollection>(courseResourceCollection, HttpStatus.OK);
+        return new ResponseEntity<CourseResourceCollection>(collection, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/form",
                     method = RequestMethod.GET,
                     produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
     public ResponseEntity<CourseForm> getCreateForm() {
-        CourseForm courseForm = new CourseForm();
-        courseForm.setTitle("");
-        courseForm.setDescription("");
-        courseForm.setInstructor("");
-        courseForm.setWorkload("");
-        courseForm.setStartDate(new DateTime().plusDays(1).toDate());
+        CourseForm form = new CourseForm();
+        form.setTitle("");
+        form.setDescription("");
+        form.setInstructor("");
+        form.setWorkload("");
+        form.setStartDate(new DateTime().plusDays(1).toDate());
 
         Link selfLink = linkTo(methodOn(CourseController.class).getCreateForm()).withSelfRel();
         Link createLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("create").withRel(ApplicationProtocol.CREATE_ACTION_REL);
         Link coursesLink = linkTo(CourseController.class).withRel(ApplicationProtocol.COURSES_REL);
-        courseForm.add(Arrays.asList(selfLink, coursesLink, createLink));
-        return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
+        form.add(Arrays.asList(selfLink, coursesLink, createLink));
+        return new ResponseEntity<CourseForm>(form, HttpStatus.OK);
     }
 
 
@@ -94,10 +94,14 @@ public class CourseController {
         LOGGER.info("Creating a course - [{}]", form);
         Course course = getCourseInfoFromForm(form);
         Course newCourse = courseService.createCourse(course);
-        CourseResource courseResource = courseResourceAssembler.toResource(newCourse);
+        CourseResource resource = courseResourceAssembler.toResource(newCourse);
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
         Link coursesLink = linkTo(CourseController.class).withRel(ApplicationProtocol.COURSES_REL);
-        courseResource.add(coursesLink);
-        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.CREATED);
+        resource.add(coursesLink);
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}",
@@ -105,8 +109,20 @@ public class CourseController {
                     produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CourseResource> showCourse(@PathVariable Long id) {
         LOGGER.info("Loading a course based on id [{}]", id);
-        CourseResource courseResource = courseResourceAssembler.toResource(courseService.getCourse(id));
-        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
+        Course course = courseService.getCourse(id);
+
+        CourseResource resource = courseResourceAssembler.toResource(course);
+
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
+
+        if(course.isApprovable()){
+            Link approveLink = linkTo(methodOn(CourseController.class).approveCourse(course.getId())).withRel(ApplicationProtocol.APPROVE_ACTION_REL);
+            resource.add(approveLink);
+        }
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/update-form",
@@ -116,18 +132,18 @@ public class CourseController {
 
         Course courseToBeUpdated = courseService.getCourse(id);
 
-        CourseForm courseForm = new CourseForm();
-        courseForm.setTitle(courseToBeUpdated.getTitle());
-        courseForm.setDescription(courseToBeUpdated.getDescription());
-        courseForm.setInstructor(courseToBeUpdated.getInstructor());
-        courseForm.setWorkload(courseToBeUpdated.getWorkload());
-        courseForm.setStartDate(courseToBeUpdated.getStartDate());
+        CourseForm form = new CourseForm();
+        form.setTitle(courseToBeUpdated.getTitle());
+        form.setDescription(courseToBeUpdated.getDescription());
+        form.setInstructor(courseToBeUpdated.getInstructor());
+        form.setWorkload(courseToBeUpdated.getWorkload());
+        form.setStartDate(courseToBeUpdated.getStartDate());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(courseToBeUpdated.getId())).withSelfRel();
         Link coursesLink = linkTo(methodOn(CourseController.class).showCourses(1, 10)).withRel(ApplicationProtocol.COURSES_REL);
         Link updateLink = ControllerLinkBuilder.linkTo(CourseController.class).slash("/"+courseToBeUpdated.getId()+"/update").withRel(ApplicationProtocol.UPDATE_ACTION_REL);
-        courseForm.add(Arrays.asList(selfLink, coursesLink, updateLink));
-        return new ResponseEntity<CourseForm>(courseForm, HttpStatus.OK);
+        form.add(Arrays.asList(selfLink, coursesLink, updateLink));
+        return new ResponseEntity<CourseForm>(form, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/update",
@@ -139,8 +155,12 @@ public class CourseController {
         Course course = getCourseInfoFromForm(form);
         course.setId(id);
         Course updatedCourse = courseService.updateCourse(course);
-        CourseResource courseResource = courseResourceAssembler.toResource(updatedCourse);
-        return new ResponseEntity<CourseResource>(courseResource, HttpStatus.OK);
+        CourseResource resource = courseResourceAssembler.toResource(updatedCourse);
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/cancel",
@@ -150,6 +170,28 @@ public class CourseController {
         courseService.deleteCourse(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
+
+    @RequestMapping(value = "/{id}/approve",
+            method = RequestMethod.PUT)
+    public ResponseEntity approveCourse(@PathVariable Long id) {
+        LOGGER.info("Approving a course - Course Id [{}]", id);
+        Course course = courseService.approveCourse(id);
+
+        CourseResource resource = courseResourceAssembler.toResource(course);
+
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
+
+//        if(course.isApprovable()){
+//            Link approveLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.APPROVE_ACTION_REL);
+//            resource.add(approveLink);
+//        }
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
+
+    }
+
 
     private Course getCourseInfoFromForm(CourseForm form){
         Course course = new Course();

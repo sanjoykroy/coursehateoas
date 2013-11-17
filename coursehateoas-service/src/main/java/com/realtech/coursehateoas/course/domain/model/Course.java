@@ -122,6 +122,10 @@ public class Course {
         this.courseStatus = courseStatus;
     }
 
+    public boolean isApprovable(){
+        return courseStatus.compareTo(CourseStatus.NEW)==0;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

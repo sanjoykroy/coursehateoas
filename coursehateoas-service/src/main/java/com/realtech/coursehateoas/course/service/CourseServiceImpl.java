@@ -4,6 +4,7 @@ import com.realtech.coursehateoas.course.annotation.ControllerService;
 import com.realtech.coursehateoas.course.domain.model.Course;
 import com.realtech.coursehateoas.course.domain.model.CourseStatus;
 import com.realtech.coursehateoas.course.exception.CourseNotFoundException;
+import com.realtech.coursehateoas.course.exception.IllegalCourseActionException;
 import com.realtech.coursehateoas.course.infrastructure.persistence.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -63,6 +64,17 @@ public class CourseServiceImpl implements CourseService {
     public Page<Course> getPaginatedCourses(int page, int pageSize) {
         Sort sort = new Sort(Sort.Direction.DESC, "createDate");
         return repository.findAll(new PageRequest(page, pageSize, sort));
+    }
+
+    @Override
+    public Course approveCourse(Long id) throws CourseNotFoundException {
+        Course course = getCourse(id);
+        if(course.isApprovable()){
+            course.setCourseStatus(CourseStatus.APPROVED);
+            return repository.saveAndFlush(course);
+        } else {
+            throw new IllegalCourseActionException("Course with id ["+id+"] is not eligible to update.");
+        }
     }
 
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {

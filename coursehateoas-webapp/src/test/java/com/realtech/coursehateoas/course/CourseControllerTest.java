@@ -66,8 +66,6 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[1].rel", is("self")))
                 .andExpect(jsonPath("$.content", hasSize(1)))
                 .andExpect(jsonPath("$.content[0].links[0].rel", is("self")))
-                .andExpect(jsonPath("$.content[0].links[1].rel", is("update-form")))
-                .andExpect(jsonPath("$.content[0].links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.content[0].title", is("Test Course")));
 
         verify(serviceMock).getPaginatedCourses(1, 1);
@@ -85,6 +83,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.links[3].rel", is("approve-action")))
                 .andExpect(jsonPath("$.title", is("Test Course")));
 
         verify(serviceMock).getCourse(100L);

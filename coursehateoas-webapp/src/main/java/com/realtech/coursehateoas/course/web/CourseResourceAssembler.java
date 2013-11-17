@@ -32,11 +32,7 @@ public class CourseResourceAssembler extends ResourceAssemblerSupport<Course, Co
         resource.setStatus(course.getCourseStatus().name());
 
         Link selfLink = linkTo(methodOn(CourseController.class).showCourse(course.getId())).withSelfRel();
-        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(selfLink);
-        resource.add(updateLink);
-        resource.add(cancelLink);
         return resource;
     }
 }
