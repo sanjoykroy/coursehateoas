@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.mvc.ControllerLinkBuilder;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -183,13 +182,7 @@ public class CourseController {
         resource.add(updateLink);
         Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(cancelLink);
-
-//        if(course.isApprovable()){
-//            Link approveLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.APPROVE_ACTION_REL);
-//            resource.add(approveLink);
-//        }
         return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
-
     }
 
 
