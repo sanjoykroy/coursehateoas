@@ -79,7 +79,7 @@ public class CourseServiceImplTest {
         Course fakeCourse = getAFakeCourse();
         when(repositoryMock.save(fakeCourse)).thenReturn(fakeCourse);
 
-        Course actual = courseService.createCourse(fakeCourse);
+        Course actual = courseService.create(fakeCourse);
 
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getId(), is(VALID_COURSE_ID));
@@ -91,7 +91,7 @@ public class CourseServiceImplTest {
     public void shouldThrowCourseNotFoundExceptionWhenUpdatingCourseIsNotAvailable() throws Exception {
         when(repositoryMock.findOne(INVALID_COURSE_ID)).thenReturn(null);
 
-        courseService.updateCourse(getAFakeCourse());
+        courseService.update(getAFakeCourse());
 
         verify(repositoryMock).findOne(INVALID_COURSE_ID);
         verifyNoMoreInteractions(repositoryMock);
@@ -103,7 +103,7 @@ public class CourseServiceImplTest {
         when(repositoryMock.findOne(fakeCourse.getId())).thenReturn(fakeCourse);
         when(repositoryMock.saveAndFlush(fakeCourse)).thenReturn(fakeCourse);
 
-        Course actual = courseService.updateCourse(fakeCourse);
+        Course actual = courseService.update(fakeCourse);
 
         assertThat(actual, is(notNullValue()));
         assertThat(actual.getId(), is(VALID_COURSE_ID));
@@ -116,7 +116,7 @@ public class CourseServiceImplTest {
     public void shouldThrowCourseNotFoundExceptionWhenDeletingCourseIsNotAvailable() throws Exception {
         when(repositoryMock.findOne(INVALID_COURSE_ID)).thenReturn(null);
 
-        courseService.deleteCourse(INVALID_COURSE_ID);
+        courseService.delete(INVALID_COURSE_ID);
 
         verify(repositoryMock).delete(INVALID_COURSE_ID);
         verifyNoMoreInteractions(repositoryMock);
@@ -127,7 +127,7 @@ public class CourseServiceImplTest {
         Course fakeCourse = getAFakeCourse();
         when(repositoryMock.findOne(VALID_COURSE_ID)).thenReturn(fakeCourse);
 
-        courseService.deleteCourse(VALID_COURSE_ID);
+        courseService.delete(VALID_COURSE_ID);
 
         verify(repositoryMock).findOne(VALID_COURSE_ID);
         verify(repositoryMock).delete(fakeCourse);
@@ -149,7 +149,7 @@ public class CourseServiceImplTest {
     public void shouldThrowCourseNotFoundExceptionIfCourseIsNotFoundToApprove() throws Exception{
         when(repositoryMock.findOne(100L)).thenReturn(null);
 
-        courseService.approveCourse(100L);
+        courseService.approve(100L);
 
         verify(repositoryMock).findOne(100L);
         verifyNoMoreInteractions(repositoryMock);
@@ -161,7 +161,7 @@ public class CourseServiceImplTest {
         fakeCourse.setCourseStatus(CourseStatus.APPROVED);
         when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
 
-        courseService.approveCourse(100L);
+        courseService.approve(100L);
 
         verify(repositoryMock).findOne(100L);
         verifyNoMoreInteractions(repositoryMock);
@@ -173,12 +173,49 @@ public class CourseServiceImplTest {
         fakeCourse.setCourseStatus(CourseStatus.NEW);
         when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
 
-        courseService.approveCourse(100L);
+        courseService.approve(100L);
 
         verify(repositoryMock).findOne(100L);
         verify(repositoryMock).saveAndFlush(fakeCourse);
         verifyNoMoreInteractions(repositoryMock);
     }
+
+    @Test(expectedExceptions = CourseNotFoundException.class)
+    public void shouldThrowCourseNotFoundExceptionIfCourseIsNotFoundToPublish() throws Exception{
+        when(repositoryMock.findOne(100L)).thenReturn(null);
+
+        courseService.publish(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test(expectedExceptions = IllegalCourseActionException.class)
+    public void shouldThrowIllegalCourseExceptionIfCourseIsNotEligibleToPublish() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.NEW);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.publish(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test
+    public void shouldPublishACourse() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.APPROVED);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.publish(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verify(repositoryMock).saveAndFlush(fakeCourse);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+
 
     // Helper
 

@@ -18,4 +18,6 @@ public class ApplicationProtocol {
 
     public static final String APPROVE_ACTION_REL = "approve-action";
 
+    public static final String PUBLISH_ACTION_REL = "publish-action";
+
 }

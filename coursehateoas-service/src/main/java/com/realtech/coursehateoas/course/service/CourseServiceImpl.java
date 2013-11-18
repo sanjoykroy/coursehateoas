@@ -35,13 +35,13 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course createCourse(Course aCourse) {
+    public Course create(Course aCourse) {
         aCourse.setCourseStatus(CourseStatus.NEW);
         return repository.save(aCourse);
     }
 
     @Override
-    public Course updateCourse(Course aCourse) throws CourseNotFoundException {
+    public Course update(Course aCourse) throws CourseNotFoundException {
         Course existedCourse = this.getCourse(aCourse.getId());
         if(existedCourse == null){
             throw new CourseNotFoundException("Course is not found.");
@@ -51,7 +51,7 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public void deleteCourse(Long id) throws CourseNotFoundException {
+    public void delete(Long id) throws CourseNotFoundException {
         Course existedCourse = this.getCourse(id);
         if(existedCourse == null){
             throw new CourseNotFoundException("Course is not found.");
@@ -67,13 +67,24 @@ public class CourseServiceImpl implements CourseService {
     }
 
     @Override
-    public Course approveCourse(Long id) throws CourseNotFoundException {
+    public Course approve(Long id) throws CourseNotFoundException {
         Course course = getCourse(id);
         if(course.isApprovable()){
             course.setCourseStatus(CourseStatus.APPROVED);
             return repository.saveAndFlush(course);
         } else {
-            throw new IllegalCourseActionException("Course with id ["+id+"] is not eligible to update.");
+            throw new IllegalCourseActionException("Course with id ["+id+"] is not eligible to approve.");
+        }
+    }
+
+    @Override
+    public Course publish(Long id) throws CourseNotFoundException, IllegalCourseActionException {
+        Course course = getCourse(id);
+        if(course.isPublishable()){
+            course.setCourseStatus(CourseStatus.PUBLISHED);
+            return repository.saveAndFlush(course);
+        } else {
+            throw new IllegalCourseActionException("Course with id ["+id+"] is not eligible to publish.");
         }
     }
 

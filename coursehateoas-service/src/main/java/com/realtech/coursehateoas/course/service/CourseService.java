@@ -15,11 +15,13 @@ public interface CourseService {
 
     Course getCourse(Long id) throws CourseNotFoundException;
 
-    Course createCourse(Course aCourse);
+    Course create(Course aCourse);
 
-    Course updateCourse(Course aCourse) throws CourseNotFoundException;
+    Course update(Course aCourse) throws CourseNotFoundException;
 
-    void deleteCourse(Long id) throws CourseNotFoundException;
+    void delete(Long id) throws CourseNotFoundException;
 
-    Course approveCourse(Long id) throws CourseNotFoundException, IllegalCourseActionException;
+    Course approve(Long id) throws CourseNotFoundException, IllegalCourseActionException;
+
+    Course publish(Long id) throws CourseNotFoundException, IllegalCourseActionException;
 }

@@ -92,11 +92,11 @@ public class CourseController {
     public ResponseEntity<CourseResource> createCourse(@RequestBody CourseForm form) {
         LOGGER.info("Creating a course - [{}]", form);
         Course course = getCourseInfoFromForm(form);
-        Course newCourse = courseService.createCourse(course);
+        Course newCourse = courseService.create(course);
         CourseResource resource = courseResourceAssembler.toResource(newCourse);
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
         resource.add(updateLink);
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(cancelLink);
         Link coursesLink = linkTo(CourseController.class).withRel(ApplicationProtocol.COURSES_REL);
         resource.add(coursesLink);
@@ -114,13 +114,19 @@ public class CourseController {
 
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
         resource.add(updateLink);
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(cancelLink);
 
         if(course.isApprovable()){
-            Link approveLink = linkTo(methodOn(CourseController.class).approveCourse(course.getId())).withRel(ApplicationProtocol.APPROVE_ACTION_REL);
+            Link approveLink = linkTo(methodOn(CourseController.class).approve(course.getId())).withRel(ApplicationProtocol.APPROVE_ACTION_REL);
             resource.add(approveLink);
         }
+
+        if(course.isPublishable()){
+            Link publishLink = linkTo(methodOn(CourseController.class).publish(course.getId())).withRel(ApplicationProtocol.PUBLISH_ACTION_REL);
+            resource.add(publishLink);
+        }
+
         return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }
 
@@ -149,38 +155,59 @@ public class CourseController {
                     method = RequestMethod.PUT,
                     produces = ApplicationProtocol.MEDIA_TYPE_THIN_JSON,
                     consumes = ApplicationProtocol.MEDIA_TYPE_THIN_JSON)
-    public ResponseEntity<CourseResource> updateCourse(@PathVariable Long id, @RequestBody CourseForm form) {
+    public ResponseEntity<CourseResource> update(@PathVariable Long id, @RequestBody CourseForm form) {
         LOGGER.info("Updating a course - Course Id [{}]", id);
         Course course = getCourseInfoFromForm(form);
         course.setId(id);
-        Course updatedCourse = courseService.updateCourse(course);
+        Course updatedCourse = courseService.update(course);
         CourseResource resource = courseResourceAssembler.toResource(updatedCourse);
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
         resource.add(updateLink);
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(cancelLink);
         return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/cancel",
                     method = RequestMethod.DELETE)
-    public ResponseEntity cancelCourse(@PathVariable Long id) {
+    public ResponseEntity cancel(@PathVariable Long id) {
         LOGGER.info("Deleting a course - Course Id [{}]", id);
-        courseService.deleteCourse(id);
+        courseService.delete(id);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @RequestMapping(value = "/{id}/approve",
             method = RequestMethod.PUT)
-    public ResponseEntity approveCourse(@PathVariable Long id) {
+    public ResponseEntity approve(@PathVariable Long id) {
         LOGGER.info("Approving a course - Course Id [{}]", id);
-        Course course = courseService.approveCourse(id);
+        Course course = courseService.approve(id);
 
         CourseResource resource = courseResourceAssembler.toResource(course);
 
         Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
         resource.add(updateLink);
-        Link cancelLink = linkTo(methodOn(CourseController.class).cancelCourse(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
+
+        if(course.isPublishable()){
+            Link publishLink = linkTo(methodOn(CourseController.class).publish(course.getId())).withRel(ApplicationProtocol.PUBLISH_ACTION_REL);
+            resource.add(publishLink);
+        }
+
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/publish",
+            method = RequestMethod.PUT)
+    public ResponseEntity publish(@PathVariable Long id) {
+        LOGGER.info("Publishing a course - Course Id [{}]", id);
+        Course course = courseService.publish(id);
+
+        CourseResource resource = courseResourceAssembler.toResource(course);
+
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
         resource.add(cancelLink);
         return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }

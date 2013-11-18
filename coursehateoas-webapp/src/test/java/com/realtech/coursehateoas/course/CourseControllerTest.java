@@ -106,7 +106,7 @@ public class CourseControllerTest {
 
     @Test
     public void shouldCreateACourse() throws Exception {
-        when(serviceMock.createCourse(isA(Course.class))).thenReturn(getTestCourse());
+        when(serviceMock.create(isA(Course.class))).thenReturn(getTestCourse());
 
         mockMvc.perform(post("/courses/create")
                 .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON))
@@ -124,7 +124,7 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[3].rel", is("courses")))
                 .andExpect(jsonPath("$.title", is("Test Course")));
 
-        verify(serviceMock).createCourse(isA(Course.class));
+        verify(serviceMock).create(isA(Course.class));
         verifyNoMoreInteractions(serviceMock);
     }
 
@@ -150,7 +150,7 @@ public class CourseControllerTest {
     public void shouldUpdateACourse() throws Exception {
         Course updatedCourse = getTestCourse();
         updatedCourse.setTitle("New Title");
-        when(serviceMock.updateCourse(isA(Course.class))).thenReturn(updatedCourse);
+        when(serviceMock.update(isA(Course.class))).thenReturn(updatedCourse);
 
         mockMvc.perform(put("/courses/100/update")
                 .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON))
@@ -167,19 +167,19 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
                 .andExpect(jsonPath("$.title", is("New Title")));
 
-        verify(serviceMock).updateCourse(isA(Course.class));
+        verify(serviceMock).update(isA(Course.class));
         verifyNoMoreInteractions(serviceMock);
     }
 
     @Test
     public void shouldDeleteACourse() throws Exception {
-        doNothing().when(serviceMock).deleteCourse(100L);
+        doNothing().when(serviceMock).delete(100L);
 
         mockMvc.perform(delete("/courses/100/cancel")
                 .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
                 .andExpect(status().isNoContent());
 
-        verify(serviceMock).deleteCourse(100L);
+        verify(serviceMock).delete(100L);
         verifyNoMoreInteractions(serviceMock);
     }
 
@@ -187,7 +187,7 @@ public class CourseControllerTest {
     public void shouldApproveACourse() throws Exception{
         Course updatedCourse = getTestCourse();
         updatedCourse.setCourseStatus(CourseStatus.APPROVED);
-        when(serviceMock.approveCourse(100L)).thenReturn(updatedCourse);
+        when(serviceMock.approve(100L)).thenReturn(updatedCourse);
 
         mockMvc.perform(put("/courses/100/approve")
                 .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
@@ -195,9 +195,28 @@ public class CourseControllerTest {
                 .andExpect(jsonPath("$.links[0].rel", is("self")))
                 .andExpect(jsonPath("$.links[1].rel", is("update-form")))
                 .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.links[3].rel", is("publish-action")))
                 .andExpect(jsonPath("$.status", is("APPROVED")));
 
-        verify(serviceMock).approveCourse(100L);
+        verify(serviceMock).approve(100L);
+        verifyNoMoreInteractions(serviceMock);
+    }
+
+    @Test
+    public void shouldPublishACourse() throws Exception{
+        Course updatedCourse = getTestCourse();
+        updatedCourse.setCourseStatus(CourseStatus.PUBLISHED);
+        when(serviceMock.publish(100L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(put("/courses/100/publish")
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-form")))
+                .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.status", is("PUBLISHED")));
+
+        verify(serviceMock).publish(100L);
         verifyNoMoreInteractions(serviceMock);
     }
 
