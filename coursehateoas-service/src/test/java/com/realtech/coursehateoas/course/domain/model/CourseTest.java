@@ -54,6 +54,20 @@ public class CourseTest {
         assertThat(aFakeCourse.isPublishable(), is(false));
     }
 
+    @Test
+    public void shouldReturnTrueIfCourseIsBlockable() throws Exception{
+        Course aFakeCourse = getCourse("test", "testDescription");
+        aFakeCourse.setCourseStatus(CourseStatus.PUBLISHED);
+        assertThat(aFakeCourse.isBlockable(), is(true));
+    }
+
+    @Test
+    public void shouldReturnFalseIfCourseIsNotBlockable() throws Exception{
+        Course aFakeCourse = getCourse("test", "testDescription");
+        aFakeCourse.setCourseStatus(CourseStatus.NEW);
+        assertThat(aFakeCourse.isBlockable(), is(false));
+    }
+
     private Course getCourse(String title, String description){
         Course course = new Course();
         course.setTitle(title);

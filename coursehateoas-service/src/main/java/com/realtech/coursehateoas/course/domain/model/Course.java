@@ -130,6 +130,10 @@ public class Course {
         return (courseStatus.compareTo(CourseStatus.APPROVED)==0);
     }
 
+    public boolean isBlockable(){
+        return (courseStatus.compareTo(CourseStatus.PUBLISHED)==0);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
