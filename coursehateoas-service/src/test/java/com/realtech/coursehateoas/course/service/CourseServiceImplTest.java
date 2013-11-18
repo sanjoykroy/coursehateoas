@@ -215,6 +215,40 @@ public class CourseServiceImplTest {
         verifyNoMoreInteractions(repositoryMock);
     }
 
+    @Test(expectedExceptions = CourseNotFoundException.class)
+    public void shouldThrowCourseNotFoundExceptionIfCourseIsNotFoundToBlock() throws Exception{
+        when(repositoryMock.findOne(100L)).thenReturn(null);
+
+        courseService.block(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test(expectedExceptions = IllegalCourseActionException.class)
+    public void shouldThrowIllegalCourseExceptionIfCourseIsNotEligibleToBlock() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.NEW);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.block(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verifyNoMoreInteractions(repositoryMock);
+    }
+
+    @Test
+    public void shouldBlockACourse() throws Exception{
+        Course fakeCourse = getAFakeCourse();
+        fakeCourse.setCourseStatus(CourseStatus.PUBLISHED);
+        when(repositoryMock.findOne(100L)).thenReturn(fakeCourse);
+
+        courseService.block(100L);
+
+        verify(repositoryMock).findOne(100L);
+        verify(repositoryMock).saveAndFlush(fakeCourse);
+        verifyNoMoreInteractions(repositoryMock);
+    }
 
 
     // Helper

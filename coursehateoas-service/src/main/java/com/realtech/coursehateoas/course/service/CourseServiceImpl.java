@@ -88,6 +88,17 @@ public class CourseServiceImpl implements CourseService {
         }
     }
 
+    @Override
+    public Course block(Long id) throws CourseNotFoundException, IllegalCourseActionException {
+        Course course = getCourse(id);
+        if(course.isBlockable()){
+            course.setCourseStatus(CourseStatus.BLOCK);
+            return repository.saveAndFlush(course);
+        } else {
+            throw new IllegalCourseActionException("Course with id ["+id+"] is not eligible to block.");
+        }
+    }
+
     private Course populateExistedCourseWithNewData(Course existedCourse, Course aCourse) {
         existedCourse.setTitle(aCourse.getTitle());
         existedCourse.setDescription(aCourse.getDescription());

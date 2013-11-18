@@ -24,4 +24,6 @@ public interface CourseService {
     Course approve(Long id) throws CourseNotFoundException, IllegalCourseActionException;
 
     Course publish(Long id) throws CourseNotFoundException, IllegalCourseActionException;
+
+    Course block(Long id) throws CourseNotFoundException, IllegalCourseActionException;
 }
