@@ -123,7 +123,11 @@ public class Course {
     }
 
     public boolean isApprovable(){
-        return courseStatus.compareTo(CourseStatus.NEW)==0;
+        return (courseStatus.compareTo(CourseStatus.NEW)==0);
+    }
+
+    public boolean isPublishable(){
+        return (courseStatus.compareTo(CourseStatus.APPROVED)==0);
     }
 
     @Override

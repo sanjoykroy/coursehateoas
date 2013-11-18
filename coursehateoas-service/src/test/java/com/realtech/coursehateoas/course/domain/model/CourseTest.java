@@ -40,6 +40,20 @@ public class CourseTest {
         assertThat(aFakeCourse.isApprovable(), is(false));
     }
 
+    @Test
+    public void shouldReturnTrueIfCourseIsPublishable() throws Exception{
+        Course aFakeCourse = getCourse("test", "testDescription");
+        aFakeCourse.setCourseStatus(CourseStatus.APPROVED);
+        assertThat(aFakeCourse.isPublishable(), is(true));
+    }
+
+    @Test
+    public void shouldReturnFalseIfCourseIsNotPublishable() throws Exception{
+        Course aFakeCourse = getCourse("test", "testDescription");
+        aFakeCourse.setCourseStatus(CourseStatus.NEW);
+        assertThat(aFakeCourse.isPublishable(), is(false));
+    }
+
     private Course getCourse(String title, String description){
         Course course = new Course();
         course.setTitle(title);
