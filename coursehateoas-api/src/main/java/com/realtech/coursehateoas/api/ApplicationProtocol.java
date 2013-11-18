@@ -20,4 +20,6 @@ public class ApplicationProtocol {
 
     public static final String PUBLISH_ACTION_REL = "publish-action";
 
+    public static final String BLOCK_ACTION_REL = "block-action";
+
 }

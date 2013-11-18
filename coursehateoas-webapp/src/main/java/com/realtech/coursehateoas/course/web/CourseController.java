@@ -127,6 +127,11 @@ public class CourseController {
             resource.add(publishLink);
         }
 
+        if(course.isBlockable()){
+            Link blockLink = linkTo(methodOn(CourseController.class).block(course.getId())).withRel(ApplicationProtocol.BLOCK_ACTION_REL);
+            resource.add(blockLink);
+        }
+
         return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
     }
 
@@ -202,6 +207,26 @@ public class CourseController {
     public ResponseEntity publish(@PathVariable Long id) {
         LOGGER.info("Publishing a course - Course Id [{}]", id);
         Course course = courseService.publish(id);
+
+        CourseResource resource = courseResourceAssembler.toResource(course);
+
+        Link updateLink = linkTo(methodOn(CourseController.class).getUpdateForm(course.getId())).withRel(ApplicationProtocol.UPDATE_FORM_REL);
+        resource.add(updateLink);
+        Link cancelLink = linkTo(methodOn(CourseController.class).cancel(course.getId())).withRel(ApplicationProtocol.CANCEL_ACTION_REL);
+        resource.add(cancelLink);
+
+        if(course.isBlockable()){
+            Link blockLink = linkTo(methodOn(CourseController.class).block(course.getId())).withRel(ApplicationProtocol.BLOCK_ACTION_REL);
+            resource.add(blockLink);
+        }
+        return new ResponseEntity<CourseResource>(resource, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/{id}/block",
+            method = RequestMethod.PUT)
+    public ResponseEntity block(@PathVariable Long id) {
+        LOGGER.info("Blocking a course - Course Id [{}]", id);
+        Course course = courseService.block(id);
 
         CourseResource resource = courseResourceAssembler.toResource(course);
 

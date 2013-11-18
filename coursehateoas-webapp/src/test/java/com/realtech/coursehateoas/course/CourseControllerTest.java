@@ -220,6 +220,24 @@ public class CourseControllerTest {
         verifyNoMoreInteractions(serviceMock);
     }
 
+    @Test
+    public void shouldBlockACourse() throws Exception{
+        Course updatedCourse = getTestCourse();
+        updatedCourse.setCourseStatus(CourseStatus.BLOCK);
+        when(serviceMock.block(100L)).thenReturn(updatedCourse);
+
+        mockMvc.perform(put("/courses/100/block")
+                .contentType(MediaType.parseMediaType(ApplicationProtocol.MEDIA_TYPE_THIN_JSON)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.links[0].rel", is("self")))
+                .andExpect(jsonPath("$.links[1].rel", is("update-form")))
+                .andExpect(jsonPath("$.links[2].rel", is("cancel-action")))
+                .andExpect(jsonPath("$.status", is("BLOCK")));
+
+        verify(serviceMock).block(100L);
+        verifyNoMoreInteractions(serviceMock);
+    }
+
     // Helper Method.
 
     private Course getTestCourse() {
